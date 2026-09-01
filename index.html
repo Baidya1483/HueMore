@@ -287,7 +287,6 @@ button{font-family:inherit;cursor:pointer}
       </svg>
     </div>
 
-    <!-- 👥 Mates button — add-friend icon (SVG Repo) -->
     <button class="icon-btn" id="matesBtn" title="Mates & requests" aria-label="Mates and requests">
       <svg viewBox="0 0 45.902 45.902" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M43.162,26.681c-1.564-1.578-3.631-2.539-5.825-2.742c1.894-1.704,3.089-4.164,3.089-6.912c0-5.141-4.166-9.307-9.308-9.307c-4.911,0-8.932,3.804-9.281,8.625c4.369,1.89,7.435,6.244,7.435,11.299c0,1.846-0.42,3.65-1.201,5.287c1.125,0.588,2.162,1.348,3.066,2.26c2.318,2.334,3.635,5.561,3.61,8.851l-0.002,0.067l-0.002,0.057l-0.082,1.557h11.149l0.092-12.33C45.921,30.878,44.936,28.466,43.162,26.681z"/>
@@ -297,7 +296,6 @@ button{font-family:inherit;cursor:pointer}
       <span class="badge" id="reqBadge" hidden>0</span>
     </button>
 
-    <!-- ⚙ Settings button — settings-alt icon (SVG Repo) -->
     <button class="icon-btn" id="gearBtn" title="Settings & privacy" aria-label="Settings and privacy">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M21.9,10.59,20,8.69V6a2,2,0,0,0-2-2H15.31l-1.9-1.9a2,2,0,0,0-2.82,0L8.69,4H6A2,2,0,0,0,4,6V8.69l-1.9,1.9a2,2,0,0,0,0,2.82L4,15.31V18a2,2,0,0,0,2,2H8.69l1.9,1.9a2,2,0,0,0,2.82,0l1.9-1.9H18a2,2,0,0,0,2-2V15.31l1.9-1.9A2,2,0,0,0,21.9,10.59ZM12,16a4,4,0,1,1,4-4A4,4,0,0,1,12,16Z"/>
@@ -455,15 +453,8 @@ button{font-family:inherit;cursor:pointer}
 <div id="toast"></div>
 
 <script type="module">
-/* ══════════ ☁ FIREBASE CONFIG (free tier) — paste web-app config for cross-device sync ══════════ */
-const FIREBASE_CONFIG = {
-  apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", 
-  authDomain:"huemore.firebaseapp.com", 
-  projectId:"huemore", 
-  storageBucket:"huemore.firebasestorage.app", 
-  messagingSenderId:"700576442367", 
-  appId:"1:700576442367:web:fb37e1692e29c6ba56e9ca" 
-};
+/* ══════════ ☁ FIREBASE CONFIG — web-app config for cross-device sync ══════════ */
+const FIREBASE_CONFIG = { apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", authDomain:"huemore.firebaseapp.com", projectId:"huemore", storageBucket:"huemore.firebasestorage.app", messagingSenderId:"700576442367", appId:"1:700576442367:web:fb37e1692e29c6ba56e9ca" };
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const LS={users:'hm.users',session:'hm.session',data:u=>'hm.data.'+u,stick:u=>'hm.stick.'+u,key:'hm.gemini',
@@ -558,94 +549,10 @@ const setLR=a=>localStorage.setItem(LS.requests,JSON.stringify(a));
 const getLM=()=>JSON.parse(localStorage.getItem(LS.mates)||'[]');
 const setLM=a=>localStorage.setItem(LS.mates,JSON.stringify(a));
 
-/* ---------- unified social API ---------- */
-async function profGet(id){
-  if(fb){const d=await fb.F.getDoc(fb.F.doc(fb.db,'profiles',id));return d.exists()?d.data():null}
-  return getLP()[id]||null;
-}
-async function profSave(p){
-  if(fb){await fb.F.setDoc(fb.F.doc(fb.db,'profiles',p.id),p)}
-  else{const m=getLP();m[p.id]=p;setLP(m)}
-}
-async function profByUsername(un){
-  un=String(un).toLowerCase();
-  if(fb){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'profiles'),fb.F.where('unameLower','==',un)));
-    return s.empty?null:s.docs[0].data()}
-  return Object.values(getLP()).find(p=>p.unameLower===un)||null;
-}
-const snapProf=p=>({id:p.id,email:p.email||'',name:p.name||'',username:p.username||'',pic:p.pic||null});
-const reqId=(a,b)=>a+'__'+b;
-async function reqSend(toProf){
-  const r={id:reqId(state.myId,toProf.id),from:state.myId,to:toProf.id,fp:snapProf(state.profile),ts:Date.now()};
-  if(fb){await fb.F.setDoc(fb.F.doc(fb.db,'requests',r.id),r)}
-  else{const a=getLR();if(!a.some(x=>x.id===r.id)){a.push(r);setLR(a)}}
-}
-async function reqIn(){
-  if(fb){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'requests'),fb.F.where('to','==',state.myId)));return s.docs.map(d=>d.data())}
-  return getLR().filter(r=>r.to===state.myId);
-}
-async function reqOut(){
-  if(fb){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'requests'),fb.F.where('from','==',state.myId)));return s.docs.map(d=>d.data())}
-  return getLR().filter(r=>r.from===state.myId);
-}
-async function reqDelete(r){
-  if(fb){await fb.F.deleteDoc(fb.F.doc(fb.db,'requests',r.id))}
-  else setLR(getLR().filter(x=>x.id!==r.id));
-}
-async function reqAccept(r){
-  const [a,b]=[state.myId,r.from].sort();
-  const mine=snapProf(state.profile);
-  const m={id:a+'~'+b,a,b,pa:a===state.myId?mine:r.fp,pb:a===state.myId?r.fp:mine,ts:Date.now()};
-  if(fb){await fb.F.setDoc(fb.F.doc(fb.db,'mates',m.id),m);await fb.F.deleteDoc(fb.F.doc(fb.db,'requests',r.id))}
-  else{const lm=getLM();if(!lm.some(x=>x.id===m.id))lm.push(m);setLM(lm);setLR(getLR().filter(x=>x.id!==r.id))}
-}
-async function matesList(){
-  if(fb){const[q1,q2]=await Promise.all([
-    fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'mates'),fb.F.where('a','==',state.myId))),
-    fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'mates'),fb.F.where('b','==',state.myId)))]);
-    return[...q1.docs,...q2.docs].map(d=>d.data())}
-  return getLM().filter(m=>m.a===state.myId||m.b===state.myId);
-}
-const mateOther=m=>m.a===state.myId?{id:m.b,...m.pb}:{id:m.a,...m.pa};
-async function mateRemove(m){
-  if(fb){await fb.F.deleteDoc(fb.F.doc(fb.db,'mates',m.id))}
-  else setLM(getLM().filter(x=>x.id!==m.id));
-}
-async function areMates(id){return (await matesList()).some(m=>m.a===id||m.b===id)}
-
-/* ---------- entries / stickies storage ---------- */
-const readLocal=u=>JSON.parse(localStorage.getItem(LS.data(u))||'{}');
-const saveLocal=()=>localStorage.setItem(LS.data(state.user),JSON.stringify(state.entries));
-const readLocalS=u=>JSON.parse(localStorage.getItem(LS.stick(u))||'{}');
-const saveLocalS=()=>localStorage.setItem(LS.stick(state.user),JSON.stringify(state.stickies));
-async function persistEntry(k,e){saveLocal();
-  if(fb&&fb.user){try{await fb.F.setDoc(fb.F.doc(fb.db,'users',fb.user.uid,'entries',k),e)}catch(err){toast('Cloud sync failed — saved on this device')}}}
-async function removeEntry(k){delete state.entries[k];saveLocal();
-  if(fb&&fb.user){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.user.uid,'entries',k))}catch(e){}}
-  renderGrid(false);renderStats();}
-async function persistSticky(k,v){
-  if(v){state.stickies[k]=v;saveLocalS();
-    if(fb&&fb.user){try{await fb.F.setDoc(fb.F.doc(fb.db,'users',fb.user.uid,'stickies',k),v)}catch(e){}}}
-  else{delete state.stickies[k];saveLocalS();
-    if(fb&&fb.user){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.user.uid,'stickies',k))}catch(e){}}}
-  renderGrid(false);
-}
-async function loadCloud(){
-  const[se,ss]=await Promise.all([
-    fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'entries')),
-    fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'stickies'))]);
-  se.forEach(d=>{const c=d.data(),l=state.entries[d.id];if(!l||(c.ts||0)>(l.ts||0))state.entries[d.id]=c});
-  ss.forEach(d=>{state.stickies[d.id]=d.data()});
-  saveLocal();saveLocalS();
-}
-async function fetchUserData(id){
-  if(fb){const s=await fb.F.getDocs(fb.F.collection(fb.db,'users',id,'entries'));
-    const o={};s.forEach(d=>o[d.id]=d.data());return o}
-  return readLocal(id);
-}
-
 /* ---------- firebase ---------- */
 let fb=null;
+/* ✅ FIX: Firestore call shudhu tokhon, jokhon user logged-in — otherwise local storage */
+function cloud(){return !!(fb&&fb.user)}
 async function initFirebase(){
   if(!FIREBASE_CONFIG.apiKey)return;
   try{
@@ -657,6 +564,92 @@ async function initFirebase(){
     fb={A,F,auth:A.getAuth(app),db:F.getFirestore(app),user:null};
     await new Promise(res=>A.onAuthStateChanged(fb.auth,u=>{fb.user=u;res()}));
   }catch(e){console.warn('Firebase unavailable:',e);fb=null}
+}
+
+/* ---------- unified social API ---------- */
+async function profGet(id){
+  if(cloud()){const d=await fb.F.getDoc(fb.F.doc(fb.db,'profiles',id));return d.exists()?d.data():null}
+  return getLP()[id]||null;
+}
+async function profSave(p){
+  if(cloud()){await fb.F.setDoc(fb.F.doc(fb.db,'profiles',p.id),p)}
+  else{const m=getLP();m[p.id]=p;setLP(m)}
+}
+async function profByUsername(un){
+  un=String(un).toLowerCase();
+  if(cloud()){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'profiles'),fb.F.where('unameLower','==',un)));
+    return s.empty?null:s.docs[0].data()}
+  return Object.values(getLP()).find(p=>p.unameLower===un)||null;
+}
+const snapProf=p=>({id:p.id,email:p.email||'',name:p.name||'',username:p.username||'',pic:p.pic||null});
+const reqId=(a,b)=>a+'__'+b;
+async function reqSend(toProf){
+  const r={id:reqId(state.myId,toProf.id),from:state.myId,to:toProf.id,fp:snapProf(state.profile),ts:Date.now()};
+  if(cloud()){await fb.F.setDoc(fb.F.doc(fb.db,'requests',r.id),r)}
+  else{const a=getLR();if(!a.some(x=>x.id===r.id)){a.push(r);setLR(a)}}
+}
+async function reqIn(){
+  if(cloud()){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'requests'),fb.F.where('to','==',state.myId)));return s.docs.map(d=>d.data())}
+  return getLR().filter(r=>r.to===state.myId);
+}
+async function reqOut(){
+  if(cloud()){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'requests'),fb.F.where('from','==',state.myId)));return s.docs.map(d=>d.data())}
+  return getLR().filter(r=>r.from===state.myId);
+}
+async function reqDelete(r){
+  if(cloud()){await fb.F.deleteDoc(fb.F.doc(fb.db,'requests',r.id))}
+  else setLR(getLR().filter(x=>x.id!==r.id));
+}
+async function reqAccept(r){
+  const [a,b]=[state.myId,r.from].sort();
+  const mine=snapProf(state.profile);
+  const m={id:a+'~'+b,a,b,pa:a===state.myId?mine:r.fp,pb:a===state.myId?r.fp:mine,ts:Date.now()};
+  if(cloud()){await fb.F.setDoc(fb.F.doc(fb.db,'mates',m.id),m);await fb.F.deleteDoc(fb.F.doc(fb.db,'requests',r.id))}
+  else{const lm=getLM();if(!lm.some(x=>x.id===m.id))lm.push(m);setLM(lm);setLR(getLR().filter(x=>x.id!==r.id))}
+}
+async function matesList(){
+  if(cloud()){const[q1,q2]=await Promise.all([
+    fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'mates'),fb.F.where('a','==',state.myId))),
+    fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'mates'),fb.F.where('b','==',state.myId)))]);
+    return[...q1.docs,...q2.docs].map(d=>d.data())}
+  return getLM().filter(m=>m.a===state.myId||m.b===state.myId);
+}
+const mateOther=m=>m.a===state.myId?{id:m.b,...m.pb}:{id:m.a,...m.pa};
+async function mateRemove(m){
+  if(cloud()){await fb.F.deleteDoc(fb.F.doc(fb.db,'mates',m.id))}
+  else setLM(getLM().filter(x=>x.id!==m.id));
+}
+async function areMates(id){return (await matesList()).some(m=>m.a===id||m.b===id)}
+
+/* ---------- entries / stickies storage ---------- */
+const readLocal=u=>JSON.parse(localStorage.getItem(LS.data(u))||'{}');
+const saveLocal=()=>localStorage.setItem(LS.data(state.user),JSON.stringify(state.entries));
+const readLocalS=u=>JSON.parse(localStorage.getItem(LS.stick(u))||'{}');
+const saveLocalS=()=>localStorage.setItem(LS.stick(state.user),JSON.stringify(state.stickies));
+async function persistEntry(k,e){saveLocal();
+  if(cloud()){try{await fb.F.setDoc(fb.F.doc(fb.db,'users',fb.user.uid,'entries',k),e)}catch(err){toast('Cloud sync failed — saved on this device')}}}
+async function removeEntry(k){delete state.entries[k];saveLocal();
+  if(cloud()){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.user.uid,'entries',k))}catch(e){}}
+  renderGrid(false);renderStats();}
+async function persistSticky(k,v){
+  if(v){state.stickies[k]=v;saveLocalS();
+    if(cloud()){try{await fb.F.setDoc(fb.F.doc(fb.db,'users',fb.user.uid,'stickies',k),v)}catch(e){}}}
+  else{delete state.stickies[k];saveLocalS();
+    if(cloud()){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.user.uid,'stickies',k))}catch(e){}}}
+  renderGrid(false);
+}
+async function loadCloud(){
+  const[se,ss]=await Promise.all([
+    fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'entries')),
+    fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'stickies'))]);
+  se.forEach(d=>{const c=d.data(),l=state.entries[d.id];if(!l||(c.ts||0)>(l.ts||0))state.entries[d.id]=c});
+  ss.forEach(d=>{state.stickies[d.id]=d.data()});
+  saveLocal();saveLocalS();
+}
+async function fetchUserData(id){
+  if(cloud()){const s=await fb.F.getDocs(fb.F.collection(fb.db,'users',id,'entries'));
+    const o={};s.forEach(d=>o[d.id]=d.data());return o}
+  return readLocal(id);
 }
 
 /* ---------- local accounts ---------- */
@@ -696,7 +689,6 @@ $('#authForm').addEventListener('submit',async e=>{
   if(uname&&!UN_RE.test(uname)){err.textContent='Username: 3–20 chars — letters, numbers and - _ < ^ > only.';return}
   btn.disabled=true;
   try{
-    if(uname){const ex=await profByUsername(uname);if(ex){err.textContent='That username is taken.';btn.disabled=false;return}}
     if(fb){
       mode==='up'?await fb.A.createUserWithEmailAndPassword(fb.auth,email,pass)
                 :await fb.A.signInWithEmailAndPassword(fb.auth,email,pass);
@@ -726,8 +718,9 @@ async function ensureProfile(){
   if(!p){p={id:state.myId,email:state.email,name:state.displayName,username:'',unameLower:'',pic:null,
     dashVis:'none',entryVis:'none',ts:Date.now()};
     if(state.pendingUsername&&UN_RE.test(state.pendingUsername)){
-      const ex=await profByUsername(state.pendingUsername);
-      if(!ex){p.username=state.pendingUsername;p.unameLower=state.pendingUsername.toLowerCase()}}
+      try{const ex=await profByUsername(state.pendingUsername);
+        if(!ex){p.username=state.pendingUsername;p.unameLower=state.pendingUsername.toLowerCase()}}catch(e){}
+    }
     await profSave(p);
   }
   state.profile=p;
@@ -905,7 +898,7 @@ function refreshSettings(){
   $$('#evRow .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===(p.entryVis||'none')));
   $('#engineState').textContent=localStorage.getItem(LS.key)?'Gemini LLM active (lexicon fallback offline)':'Built-in lexicon analyzer (fully offline)';
   $('#gemKey').value=localStorage.getItem(LS.key)||'';
-  $('#cloudInfo').textContent=fb&&fb.user?`Synced as ${state.email} — journal follows you anywhere.`:'Local mode. Add the free Firebase config in code for cross-device sync.';
+  $('#cloudInfo').textContent=cloud()?`Synced as ${state.email} — journal follows you anywhere.`:'Local mode. Add the free Firebase config in code for cross-device sync.';
 }
 $('#pfPic').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
@@ -1028,7 +1021,7 @@ $('#sampleBtn').onclick=loadSamples;
 $('#sSample').onclick=()=>{closeOv($('#setOverlay'));loadSamples()};
 $('#sClearS').onclick=()=>{Object.keys(state.entries).forEach(k=>{if(state.entries[k].sample)delete state.entries[k]});saveLocal();renderGrid(true);renderStats();toast('Samples cleared')};
 $('#sClearAll').onclick=async()=>{if(!confirm('Delete ALL entries & sticky notes on this device?'))return;
-  if(fb&&fb.user){try{
+  if(cloud()){try{
     const[se,ss]=await Promise.all([fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'entries')),fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'stickies'))]);
     await Promise.all([...se.docs,...ss.docs].map(d=>fb.F.deleteDoc(d.ref)))}catch(e){}}
   state.entries={};state.stickies={};saveLocal();saveLocalS();renderGrid(true);renderStats();toast('All cleared')};
