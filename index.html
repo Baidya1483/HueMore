@@ -19,16 +19,15 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-color:#2a3242 transparent}
 body{background:var(--ink);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+/* ✅ flicker fix: static background layers (no fullscreen animation) */
 #bg{position:fixed;inset:0;z-index:-1;background:
   radial-gradient(900px 620px at 88% 112%,rgba(46,143,232,.16),transparent 62%),
   radial-gradient(820px 540px at 8% -12%,rgba(255,176,32,.11),transparent 60%),var(--ink)}
 #bg::before{content:'';position:absolute;inset:-20%;
-  background:radial-gradient(600px 400px at 60% 40%,rgba(46,143,232,.07),transparent 70%);
-  
+  background:radial-gradient(600px 400px at 60% 40%,rgba(46,143,232,.07),transparent 70%)}
 #bg::after{content:'';position:absolute;inset:0;
   background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);background-size:26px 26px;
   mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 75%)}
-@keyframes drift{to{transform:translate(-8%,6%)}}
 button{font-family:inherit;cursor:pointer}
 ::selection{background:rgba(255,176,32,.35)}
 
@@ -50,7 +49,6 @@ button{font-family:inherit;cursor:pointer}
 @keyframes breathe{to{opacity:.55}}
 .legend-row{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
 .spectrum-bar{height:9px;border-radius:99px;background:var(--spectrum)}
-@keyframes shimmer{to{background-position:100% 0}}
 .auth-right{display:flex;align-items:center;justify-content:center;padding:32px}
 .auth-card{width:min(410px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
 .tabs{display:flex;gap:4px;background:var(--panel2);border-radius:9px;padding:4px;margin-bottom:20px}
@@ -62,6 +60,13 @@ button{font-family:inherit;cursor:pointer}
   padding:11px 14px;font-size:15px;font-family:inherit;transition:border-color .2s,box-shadow .2s}
 .field input:focus{outline:none;border-color:rgba(255,176,32,.55);box-shadow:0 0 0 3px rgba(255,176,32,.12)}
 .field .hintline{font-size:11.5px;color:var(--mut);margin-top:5px}
+/* ---------- 👁 password eye ---------- */
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:44px}
+.settings-row .pass-wrap input{width:100%}
+.pass-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:var(--mut);width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:7px;transition:.2s}
+.pass-eye:hover{color:var(--text)}
+.pass-eye svg{width:18px;height:18px;fill:currentColor}
 .primary-btn{width:100%;border:0;border-radius:9px;padding:13px;font-size:15px;font-weight:800;color:#07130a;
   background:var(--today);transition:transform .15s,box-shadow .15s;margin-top:4px}
 .primary-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(10,199,64,.35)}
@@ -139,7 +144,7 @@ button{font-family:inherit;cursor:pointer}
 .hm-foot .spectrum-bar{width:150px}
 .hm-foot .hint{margin-left:auto;font-style:italic}
 
-/* ---------- overlays / modals ---------- */
+/* ---------- overlays (✅ flicker fix: blur shudhu khola modal e) ---------- */
 .overlay{position:fixed;inset:0;background:rgba(5,8,12,.9);z-index:60;
   display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.show{opacity:1;pointer-events:auto;backdrop-filter:blur(6px)}
@@ -256,7 +261,15 @@ button{font-family:inherit;cursor:pointer}
           <div class="hintline">letters · numbers · and only - _ &lt; ^ &gt;</div>
         </div>
         <div class="field"><label>Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="you@somewhere.com"></div>
-        <div class="field"><label>Password</label><input id="authPass" type="password" required minlength="6" autocomplete="current-password" placeholder="min. 6 characters"></div>
+        <div class="field"><label>Password</label>
+          <div class="pass-wrap">
+            <input id="authPass" type="password" required minlength="6" autocomplete="current-password" placeholder="min. 6 characters">
+            <button type="button" class="pass-eye" data-eye="authPass" title="Show / hide password" aria-label="Show or hide password">
+              <svg class="eye-on" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              <svg class="eye-off" viewBox="0 0 24 24" style="display:none"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+            </button>
+          </div>
+        </div>
         <button class="primary-btn" id="authSubmit" type="submit">Sign in</button>
         <div class="err" id="authErr"></div>
       </form>
@@ -419,6 +432,24 @@ button{font-family:inherit;cursor:pointer}
     <div class="settings-row"><div><div class="t">Journal entries visible to</div><div class="s">Entries can never be public — None or Mates only.</div></div>
       <div class="pills" id="evRow"><button class="pill" data-v="none">None</button><button class="pill" data-v="mates">Only Mates</button></div></div>
 
+    <div class="set-sec">Security</div>
+    <div class="settings-row" id="pcRow"><div><div class="t">Change password</div><div class="s">Current password mile gele tobe notun password set hobe (min 6 chars).</div></div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:min(260px,100%)">
+        <div class="pass-wrap"><input id="pcOld" type="password" placeholder="Current password">
+          <button type="button" class="pass-eye" data-eye="pcOld" title="Show / hide">
+            <svg class="eye-on" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="eye-off" viewBox="0 0 24 24" style="display:none"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+          </button></div>
+        <div class="pass-wrap"><input id="pcNew" type="password" placeholder="New password (min 6)">
+          <button type="button" class="pass-eye" data-eye="pcNew" title="Show / hide">
+            <svg class="eye-on" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            <svg class="eye-off" viewBox="0 0 24 24" style="display:none"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+          </button></div>
+        <button id="pcSave">Update password</button>
+        <div id="pcMsg" style="font-size:12.5px"></div>
+      </div>
+    </div>
+
     <div class="set-sec">Social</div>
     <div class="settings-row"><div><div class="t">Mates</div><div class="s">Search users, send / accept Mate requests, view Mates' journals.</div></div>
       <button id="openMates2">Open Mates</button></div>
@@ -453,7 +484,7 @@ button{font-family:inherit;cursor:pointer}
 <div id="toast"></div>
 
 <script type="module">
-/* ══════════ ☁ FIREBASE CONFIG — web-app config for cross-device sync ══════════ */
+/* ══════════ ☁ FIREBASE CONFIG — tomar 6 ta value ekhane boshao ══════════ */
 const FIREBASE_CONFIG = { apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", authDomain:"huemore.firebaseapp.com", projectId:"huemore", storageBucket:"huemore.firebasestorage.app", messagingSenderId:"700576442367", appId:"1:700576442367:web:fb37e1692e29c6ba56e9ca" };
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -551,7 +582,6 @@ const setLM=a=>localStorage.setItem(LS.mates,JSON.stringify(a));
 
 /* ---------- firebase ---------- */
 let fb=null;
-/* ✅ FIX: Firestore call shudhu tokhon, jokhon user logged-in — otherwise local storage */
 function cloud(){return !!(fb&&fb.user)}
 async function initFirebase(){
   if(!FIREBASE_CONFIG.apiKey)return;
@@ -935,6 +965,39 @@ $('#evRow').addEventListener('click',async e=>{
 });
 $('#gemSave').onclick=()=>{localStorage.setItem(LS.key,$('#gemKey').value.trim());refreshSettings();toast('Gemini key saved')};
 $('#gemRemove').onclick=()=>{localStorage.removeItem(LS.key);$('#gemKey').value='';refreshSettings();toast('Using built-in analyzer')};
+
+/* ---------- 👁 password eye toggle + 🔑 change password ---------- */
+$$('.pass-eye').forEach(b=>b.addEventListener('click',()=>{
+  const i=document.getElementById(b.dataset.eye);if(!i)return;
+  const nowText=i.type==='password';
+  i.type=nowText?'text':'password';
+  b.querySelector('.eye-on').style.display=nowText?'none':'';
+  b.querySelector('.eye-off').style.display=nowText?'':'none';
+  i.focus();
+}));
+$('#gearBtn').addEventListener('click',()=>{$('#pcRow').style.display=(state.user==='guest')?'none':'flex'});
+$('#pcSave').onclick=async()=>{
+  const msg=$('#pcMsg');msg.textContent='';
+  const old=$('#pcOld').value,nw=$('#pcNew').value;
+  if(nw.length<6){msg.style.color='#ff8484';msg.textContent='New password must be at least 6 characters.';return}
+  if(cloud()){
+    try{
+      const cred=fb.A.EmailAuthProvider.credential(state.email,old);
+      await fb.A.reauthenticateWithCredential(fb.user,cred);
+      await fb.A.updatePassword(fb.user,nw);
+      msg.style.color='var(--today)';msg.textContent='Password updated ✅';
+      $('#pcOld').value='';$('#pcNew').value='';
+    }catch(e){msg.style.color='#ff8484';msg.textContent=(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential')?'Wrong current password.':friendly(e)}
+  }else if(state.user&&state.user.startsWith('local:')){
+    const users=getUsers();const u=users[state.email];
+    if(!u||u.hash!==await sha(u.salt+old)){msg.style.color='#ff8484';msg.textContent='Wrong current password.';return}
+    const salt=Math.random().toString(36).slice(2);
+    u.salt=salt;u.hash=await sha(salt+nw);users[state.email]=u;
+    localStorage.setItem(LS.users,JSON.stringify(users));
+    msg.style.color='var(--today)';msg.textContent='Password updated ✅';
+    $('#pcOld').value='';$('#pcNew').value='';
+  }
+};
 
 /* ---------- viewing ---------- */
 async function viewUser(prof){
