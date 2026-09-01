@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HueMore — a year in colour</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎨</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Karla:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b0e13; --panel:#12161f; --panel2:#171d28; --line:rgba(255,255,255,.08);
+  --text:#eef1f6; --mut:#98a2b3; --euph:#FFB020; --dys:#2E8FE8; --today:#0AC740; --ivory:#FFFBEB;
+  --disp:'Fraunces',Georgia,serif; --body:'Karla',system-ui,sans-serif;
+  --cell:13px; --gap:3px;
+  --spectrum:linear-gradient(90deg,rgb(46,143,232),rgb(151,160,132),rgb(255,176,32));
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-color:#2a3242 transparent}
+body{background:var(--ink);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+#bg{position:fixed;inset:0;z-index:-1;background:
+  radial-gradient(900px 620px at 88% 112%,rgba(46,143,232,.16),transparent 62%),
+  radial-gradient(820px 540px at 8% -12%,rgba(255,176,32,.11),transparent 60%),var(--ink)}
+#bg::before{content:'';position:absolute;inset:-20%;
+  background:radial-gradient(600px 400px at 60% 40%,rgba(46,143,232,.07),transparent 70%);
+  animation:drift 46s ease-in-out infinite alternate}
+#bg::after{content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(255,255,255,.045) 1px,transparent 1px);background-size:26px 26px;
+  mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 75%)}
+@keyframes drift{to{transform:translate(-8%,6%)}}
+button{font-family:inherit;cursor:pointer}
+::selection{background:rgba(255,176,32,.35)}
+
+.brand{font-family:var(--disp);font-size:26px;letter-spacing:-.5px;font-weight:400;white-space:nowrap;color:var(--text)}
+.brand b{font-weight:800;font-style:italic}
+.legend-anim{display:flex;align-items:center;margin-left:auto}
+.la-svg{overflow:visible;display:block}
+
+/* ---------- AUTH ---------- */
+#authView{min-height:100vh;display:grid;grid-template-columns:1.2fr 1fr}
+.auth-left{padding:clamp(28px,6vw,80px);display:flex;flex-direction:column;justify-content:center;gap:26px;border-right:1px solid var(--line)}
+.auth-left .display{font-family:var(--disp);font-size:clamp(38px,5vw,68px);line-height:1.04;font-weight:380;letter-spacing:-1.5px}
+.auth-left .display em{font-style:italic;font-weight:700}
+.h-e{color:var(--euph)} .h-d{color:var(--dys)}
+.lede{color:var(--mut);font-size:16.5px;line-height:1.65;max-width:52ch}
+.lede b{color:var(--text);font-weight:700}
+#miniGrid{display:grid;grid-template-columns:repeat(14,12px);gap:4px;width:max-content}
+#miniGrid i{width:12px;height:12px;border-radius:3px;animation:cellIn .5s both,breathe 7s ease-in-out infinite alternate}
+@keyframes breathe{to{opacity:.55}}
+.legend-row{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.spectrum-bar{height:9px;border-radius:99px;background:var(--spectrum);background-size:200% 100%;animation:shimmer 9s ease-in-out infinite alternate}
+@keyframes shimmer{to{background-position:100% 0}}
+.auth-right{display:flex;align-items:center;justify-content:center;padding:32px}
+.auth-card{width:min(410px,100%);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.tabs{display:flex;gap:4px;background:var(--panel2);border-radius:9px;padding:4px;margin-bottom:20px}
+.tabs button{flex:1;border:0;background:transparent;color:var(--mut);padding:9px;border-radius:7px;font-weight:700;font-size:14px;transition:.2s}
+.tabs button.on{background:#232b3a;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.field{margin-bottom:13px}
+.field label{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.field input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--text);
+  padding:11px 14px;font-size:15px;font-family:inherit;transition:border-color .2s,box-shadow .2s}
+.field input:focus{outline:none;border-color:rgba(255,176,32,.55);box-shadow:0 0 0 3px rgba(255,176,32,.12)}
+.field .hintline{font-size:11.5px;color:var(--mut);margin-top:5px}
+.primary-btn{width:100%;border:0;border-radius:9px;padding:13px;font-size:15px;font-weight:800;color:#07130a;
+  background:var(--today);transition:transform .15s,box-shadow .15s;margin-top:4px}
+.primary-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(10,199,64,.35)}
+.primary-btn:disabled{opacity:.6;cursor:wait;transform:none}
+.err{color:#ff8484;font-size:13px;min-height:18px;margin-top:8px}
+.or{display:flex;align-items:center;gap:12px;color:var(--mut);font-size:12px;letter-spacing:.15em;margin:14px 0}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--line)}
+.ghost-btn{width:100%;background:transparent;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:12px;font-weight:700;transition:.2s}
+.ghost-btn:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.04)}
+.mode-badge{margin-top:16px;text-align:center;font-size:12px;color:var(--mut)}
+.mode-badge .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--mut)}
+.mode-badge.cloud .dot{background:var(--today);box-shadow:0 0 8px rgba(10,199,64,.8)}
+
+/* ---------- APP ---------- */
+#appView{max-width:1060px;margin:0 auto;padding:22px clamp(14px,3vw,32px) 80px}
+.topbar{display:flex;align-items:center;gap:16px;padding:10px 0 22px;flex-wrap:wrap}
+.icon-btn{position:relative;background:var(--panel2);border:1px solid var(--line);color:var(--text);width:38px;height:38px;border-radius:9px;transition:.2s;
+  display:inline-flex;align-items:center;justify-content:center}
+.icon-btn svg{width:19px;height:19px;fill:currentColor;display:block}
+.icon-btn:hover{border-color:rgba(255,255,255,.28);transform:translateY(-1px);color:#fff}
+.badge{position:absolute;top:-7px;right:-7px;background:var(--euph);color:#0b0e13;font-size:10px;font-weight:800;border-radius:99px;padding:1px 5px}
+.user-chip{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut);background:var(--panel2);
+  border:1px solid var(--line);border-radius:99px;padding:5px 8px 5px 6px}
+.user-chip button{border:0;background:rgba(255,255,255,.08);color:var(--text);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;transition:.2s}
+.user-chip button:hover{background:rgba(255,90,90,.25)}
+.avatar{position:relative;display:inline-grid;place-items:center;border-radius:50%;background:#232b3a;overflow:hidden;flex:none;border:1px solid var(--line)}
+.av-init{font-family:var(--disp);font-weight:700;color:var(--euph)}
+.av-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.view-banner{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;
+  background:linear-gradient(90deg,rgba(46,143,232,.16),rgba(255,176,32,.12));border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-bottom:14px;font-size:14px}
+.view-banner button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px}
+.view-banner button:hover{border-color:rgba(255,255,255,.3)}
+.controls{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 20px}
+.year-nav{display:flex;align-items:center;gap:6px}
+.year-nav button{background:var(--panel2);border:1px solid var(--line);color:var(--text);width:34px;height:38px;border-radius:8px;font-size:17px;transition:.2s}
+.year-nav button:hover{border-color:rgba(255,255,255,.3)}
+.year-nav .yr{font-family:var(--disp);font-size:32px;font-weight:600;min-width:96px;text-align:center;letter-spacing:-.5px;transform-origin:center}
+.yr.flip{animation:pageflip .45s ease both}
+@keyframes pageflip{0%{transform:perspective(420px) rotateX(0)}45%{transform:perspective(420px) rotateX(-90deg);opacity:.1}55%{transform:perspective(420px) rotateX(90deg);opacity:.1}100%{transform:perspective(420px) rotateX(0)}}
+.stats{display:flex;gap:26px;flex-wrap:wrap}
+.stat .n{font-family:var(--disp);font-size:27px;font-weight:600;line-height:1.1}
+.stat .l{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.mood-chip{display:inline-block;padding:2px 12px;border-radius:99px;font-family:var(--disp);font-size:17px;font-weight:600;color:#0b0e13}
+#todayBtn{position:relative;margin-left:auto;border:0;border-radius:11px;padding:14px 26px;font-size:16px;font-weight:800;
+  color:#06170b;background:var(--today);letter-spacing:.01em;transition:transform .15s,box-shadow .15s}
+#todayBtn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(10,199,64,.4)}
+#todayBtn::after{content:'';position:absolute;inset:-5px;border-radius:15px;border:2px solid var(--today);opacity:0;animation:ring 2.8s ease-out infinite}
+@keyframes ring{0%{opacity:.6;transform:scale(.96)}70%,100%{opacity:0;transform:scale(1.1)}}
+
+.hm-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+#emptyBar{display:none;align-items:center;gap:14px;flex-wrap:wrap;background:var(--panel2);border:1px dashed var(--line);
+  border-radius:10px;padding:12px 16px;margin-bottom:18px;color:var(--mut);font-size:14px}
+#emptyBar button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px;transition:.2s}
+#emptyBar button:hover{border-color:var(--euph);color:var(--euph)}
+.hm-scroll{overflow-x:auto;padding-top:6px}
+.hm-scroll::-webkit-scrollbar{height:8px}
+.hm-scroll::-webkit-scrollbar-thumb{background:#2a3242;border-radius:99px}
+.hm-months{display:grid;gap:var(--gap);height:16px;margin-left:34px;font-size:11px;color:var(--mut);letter-spacing:.06em;margin-bottom:6px}
+.hm-row{display:flex;gap:8px}
+.hm-dow{display:grid;grid-template-rows:repeat(7,var(--cell));gap:var(--gap);width:26px;font-size:10px;color:var(--mut)}
+.hm-dow span{display:flex;align-items:center}
+#grid{display:grid;grid-template-rows:repeat(7,var(--cell));grid-auto-flow:column;gap:var(--gap);grid-auto-columns:var(--cell)}
+.cell{width:var(--cell);height:var(--cell);border-radius:3px;border:0;padding:0;position:relative;transition:transform .15s ease,box-shadow .15s ease}
+.cell.empty{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.cell.future{background:rgba(255,255,255,.02);cursor:default}
+.cell.pad{visibility:hidden;cursor:default}
+.cell:not(.future):not(.pad):hover{transform:scale(1.45);z-index:6;box-shadow:0 3px 12px rgba(0,0,0,.55)}
+.cell.today{box-shadow:0 0 0 1.5px var(--today)}
+.cell.in{animation:cellIn .45s both}
+@keyframes cellIn{from{opacity:0;transform:scale(.3)}}
+.cell.pulse{animation:pulseCell 1s ease 3}
+@keyframes pulseCell{0%{box-shadow:0 0 0 0 rgba(10,199,64,.85)}100%{box-shadow:0 0 0 9px rgba(10,199,64,0)}}
+.stick{position:absolute;right:-2px;bottom:-2px;width:0;height:0;border-bottom:8px solid var(--ivory);border-left:8px solid transparent;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+.hm-foot{display:flex;align-items:center;gap:12px;margin-top:18px;font-size:12px;color:var(--mut);flex-wrap:wrap}
+.hm-foot .spectrum-bar{width:150px}
+.hm-foot .hint{margin-left:auto;font-style:italic}
+
+/* ---------- overlays / modals ---------- */
+.overlay{position:fixed;inset:0;background:rgba(5,8,12,.68);backdrop-filter:blur(7px);z-index:60;
+  display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .25s}
+.overlay.show{opacity:1;pointer-events:auto}
+.modal{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px;
+  box-shadow:0 40px 100px rgba(0,0,0,.55);transform:translateY(16px) scale(.97);transition:transform .32s cubic-bezier(.2,.9,.3,1.15);
+  max-height:88vh;overflow-y:auto}
+.overlay.show .modal{transform:none}
+.modal .x{float:right;background:var(--panel2);border:1px solid var(--line);color:var(--mut);width:32px;height:32px;border-radius:8px;font-size:15px;transition:.2s}
+.modal .x:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
+.d-date{font-family:var(--disp);font-size:clamp(22px,4vw,30px);font-weight:600;letter-spacing:-.5px;margin:6px 0 18px;line-height:1.15}
+.spec-track{position:relative;height:12px;border-radius:99px;background:var(--spectrum);margin:8px 0 4px}
+.spec-marker{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;border:3px solid #fff;background:#0006;
+  transform:translate(-50%,-50%);box-shadow:0 2px 10px rgba(0,0,0,.5);transition:left .8s cubic-bezier(.2,.9,.3,1.2)}
+.spec-ends{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:16px}
+.mood-line{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.entry-text{font-size:16.5px;line-height:1.75;color:#dfe4ec;white-space:pre-wrap;padding:18px;background:var(--panel2);
+  border-left:3px solid;border-radius:0 10px 10px 0}
+.meta{color:var(--mut);font-size:12.5px;margin-top:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:rgba(255,255,255,.08);border-radius:99px;padding:3px 9px}
+.modal-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.modal-actions button{border-radius:9px;padding:10px 18px;font-weight:800;font-size:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);transition:.2s}
+.modal-actions button:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.3)}
+.modal-actions .danger:hover{border-color:#ff6b6b;color:#ff8484}
+.blank-day{text-align:center;padding:26px 10px;color:var(--mut)}
+.blank-day .big{font-family:var(--disp);font-size:22px;color:var(--text);margin-bottom:6px;font-style:italic}
+#edText{width:100%;min-height:180px;resize:vertical;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+  color:var(--text);padding:16px;font-family:var(--body);font-size:16px;line-height:1.7}
+#edText:focus{outline:none;border-color:rgba(255,176,32,.5)}
+.ed-foot{display:flex;align-items:center;gap:12px;margin-top:12px}
+#edCount{font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
+#edCount.warn{color:var(--euph);font-weight:700}
+.ed-foot .spacer{flex:1}
+#edStick{background:var(--ivory);color:#4a3f26;border:0;border-radius:9px;width:44px;height:44px;font-size:19px;font-weight:800;transition:.2s;transform:rotate(2deg);flex:none}
+#edStick:hover{transform:rotate(-2deg) translateY(-2px);box-shadow:0 8px 20px rgba(255,251,235,.2)}
+.sticky-note{background:var(--ivory);color:#4a3f26;border-radius:4px;padding:14px 16px;transform:rotate(-1.2deg);
+  box-shadow:0 10px 24px rgba(0,0,0,.4);margin:16px 0 4px;position:relative;font-size:14.5px;line-height:1.6;white-space:pre-wrap}
+.sticky-note::after{content:'';position:absolute;right:0;bottom:0;width:0;height:0;border-top:16px solid rgba(0,0,0,.14);border-right:16px solid transparent}
+.sn-head{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;color:#8a7a4d}
+.sn-head button{border:0;background:transparent;color:#8a7a4d;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.12em;text-transform:uppercase}
+.sn-head button:hover{color:#c0392b}
+#skText{width:100%;min-height:140px;background:var(--ivory);color:#4a3f26;border:0;border-radius:4px;padding:14px 16px;font-family:var(--body);font-size:15px;line-height:1.6;transform:rotate(-.5deg);resize:vertical}
+#skText:focus{outline:2px solid rgba(0,0,0,.15)}
+.set-sec{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:20px 0 6px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.settings-row:last-of-type{border:0}
+.settings-row .t{font-weight:700;font-size:14px}
+.settings-row .s{font-size:12.5px;color:var(--mut);max-width:34ch}
+.settings-row input{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px 12px;font-size:13px;width:200px;font-family:inherit}
+.settings-row button{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;transition:.2s}
+.settings-row button:hover{border-color:rgba(255,255,255,.3)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{border:1px solid var(--line);background:var(--panel2);color:var(--mut);border-radius:99px;padding:6px 14px;font-size:12.5px;font-weight:700;transition:.2s}
+.pill.on{background:var(--euph);border-color:var(--euph);color:#0b0e13}
+.pill:hover{border-color:rgba(255,255,255,.3)}
+.pf-line{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.file-label{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;transition:.2s}
+.file-label:hover{border-color:rgba(255,255,255,.3)}
+.m-search{display:flex;gap:8px;margin-bottom:8px}
+.m-search input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:11px 14px;font-size:14px;font-family:inherit}
+.m-search input:focus{outline:none;border-color:rgba(255,176,32,.5)}
+.m-search button{border:0;background:var(--euph);color:#0b0e13;border-radius:9px;padding:0 18px;font-weight:800}
+.u-card{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.u-info{flex:1;display:flex;flex-direction:column;min-width:0}
+.u-info b{font-size:14px;overflow:hidden;text-overflow:ellipsis}
+.u-info span{font-size:12px;color:var(--mut)}
+.u-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.u-acts button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;transition:.2s}
+.u-acts button:hover{border-color:rgba(255,255,255,.35)}
+.u-acts button.go{border-color:var(--today);color:var(--today)}
+.u-acts button.warn:hover{border-color:#ff6b6b;color:#ff8484}
+.m-sec{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:16px 0 2px}
+
+#tip{position:fixed;z-index:90;background:#1c2331;border:1px solid var(--line);padding:6px 11px;border-radius:8px;
+  font-size:12px;pointer-events:none;opacity:0;transition:opacity .12s;transform:translate(-50%,-100%);white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:#1c2331;border:1px solid var(--line);
+  border-radius:99px;padding:11px 22px;font-size:14px;font-weight:700;opacity:0;transition:.3s;z-index:99;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:900px){
+  #authView{grid-template-columns:1fr}
+  .auth-left{border-right:0;border-bottom:1px solid var(--line)}
+  #todayBtn{margin-left:0;width:100%}
+  .legend-anim{margin-left:0}
+}
+</style>
+</head>
+<body>
+<div id="bg" aria-hidden="true"></div>
+
+<!-- ═══════════ LOGIN ═══════════ -->
+<section id="authView">
+  <div class="auth-left">
+    <div class="brand">Hue<b>More</b></div>
+    <h1 class="display">365 days.<br><em>One <span class="h-e">hue</span> each — until the year becomes a <span class="h-d">colour map</span> of you.</em></h1>
+    <p class="lede">Write about <b>250 words a day</b>; HueMore reads the feeling and colours that day from
+      <b class="h-d">Dysphoric</b> to <b class="h-e">Euphoric</b>. Jot ivory <b>sticky notes</b> beside entries, pick a unique
+      <b>username</b>, connect with <b>Mates</b> — and decide exactly who sees which part of your year.</p>
+    <div id="miniGrid"></div>
+    <div class="legend-row"><span style="color:var(--dys)">Dysphoric</span><span class="spectrum-bar" style="width:140px"></span><span style="color:var(--euph)">Euphoric</span></div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="tabs">
+        <button id="tabIn" class="on">Sign in</button>
+        <button id="tabUp">Create account</button>
+      </div>
+      <form id="authForm">
+        <div class="field" id="nameRow" hidden>
+          <label>Profile name</label>
+          <input id="authName" type="text" autocomplete="name" placeholder="The name shown on your profile">
+        </div>
+        <div class="field" id="userRow" hidden>
+          <label>Username <span style="text-transform:none;letter-spacing:0">(optional, unique)</span></label>
+          <input id="authUser" type="text" autocomplete="username" placeholder="e.g. night-owl_42">
+          <div class="hintline">letters · numbers · and only - _ &lt; ^ &gt;</div>
+        </div>
+        <div class="field"><label>Email</label><input id="authEmail" type="email" required autocomplete="email" placeholder="you@somewhere.com"></div>
+        <div class="field"><label>Password</label><input id="authPass" type="password" required minlength="6" autocomplete="current-password" placeholder="min. 6 characters"></div>
+        <button class="primary-btn" id="authSubmit" type="submit">Sign in</button>
+        <div class="err" id="authErr"></div>
+      </form>
+      <div class="or">OR</div>
+      <button class="ghost-btn" id="guestBtn">Continue as Guest — stays on this device</button>
+      <div class="mode-badge" id="modeBadge"><span class="dot"></span><span id="modeTxt"></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ DASHBOARD ═══════════ -->
+<section id="appView" hidden>
+  <header class="topbar">
+    <div class="brand">Hue<b>More</b></div>
+    <div class="legend-anim" title="The mood spectrum — Dysphoric → Euphoric" aria-label="Mood spectrum from Dysphoric to Euphoric">
+      <svg class="la-svg" viewBox="0 0 220 44" width="200" height="40" aria-hidden="true">
+        <defs>
+          <linearGradient id="specGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#2E8FE8"/><stop offset="50%" stop-color="rgb(151,160,132)"/><stop offset="100%" stop-color="#FFB020"/>
+          </linearGradient>
+        </defs>
+        <path id="writePath" d="M6 34 C 36 26, 58 38, 90 30 S 148 36, 176 28 S 204 32, 214 29" fill="none" stroke="url(#specGrad)" stroke-width="5" stroke-linecap="round"/>
+        <g id="pen">
+          <path d="M0 0 L2.6 -6.4 L8.4 -11.6 L11.6 -8.4 L6.4 -2.6 Z" fill="#e9edf5"/>
+          <path d="M9.5 -12.5 L19 -22" stroke="#e9edf5" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M9.5 -12.5 L19 -22" stroke="url(#specGrad)" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- 👥 Mates button — add-friend icon (SVG Repo) -->
+    <button class="icon-btn" id="matesBtn" title="Mates & requests" aria-label="Mates and requests">
+      <svg viewBox="0 0 45.902 45.902" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M43.162,26.681c-1.564-1.578-3.631-2.539-5.825-2.742c1.894-1.704,3.089-4.164,3.089-6.912c0-5.141-4.166-9.307-9.308-9.307c-4.911,0-8.932,3.804-9.281,8.625c4.369,1.89,7.435,6.244,7.435,11.299c0,1.846-0.42,3.65-1.201,5.287c1.125,0.588,2.162,1.348,3.066,2.26c2.318,2.334,3.635,5.561,3.61,8.851l-0.002,0.067l-0.002,0.057l-0.082,1.557h11.149l0.092-12.33C45.921,30.878,44.936,28.466,43.162,26.681z"/>
+        <path d="M23.184,34.558c1.893-1.703,3.092-4.164,3.092-6.912c0-5.142-4.168-9.309-9.309-9.309c-5.142,0-9.309,4.167-9.309,9.309c0,2.743,1.194,5.202,3.084,6.906c-4.84,0.375-8.663,4.383-8.698,9.318l-0.092,1.853h14.153h15.553l0.092-1.714c0.018-2.514-0.968-4.926-2.741-6.711C27.443,35.719,25.377,34.761,23.184,34.558z"/>
+        <path d="M6.004,11.374v3.458c0,1.432,1.164,2.595,2.597,2.595c1.435,0,2.597-1.163,2.597-2.595v-3.458h3.454c1.433,0,2.596-1.164,2.596-2.597c0-1.432-1.163-2.596-2.596-2.596h-3.454V2.774c0-1.433-1.162-2.595-2.597-2.595c-1.433,0-2.597,1.162-2.597,2.595V6.18H2.596C1.161,6.18,0,7.344,0,8.776c0,1.433,1.161,2.597,2.596,2.597H6.004z"/>
+      </svg>
+      <span class="badge" id="reqBadge" hidden>0</span>
+    </button>
+
+    <!-- ⚙ Settings button — settings-alt icon (SVG Repo) -->
+    <button class="icon-btn" id="gearBtn" title="Settings & privacy" aria-label="Settings and privacy">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M21.9,10.59,20,8.69V6a2,2,0,0,0-2-2H15.31l-1.9-1.9a2,2,0,0,0-2.82,0L8.69,4H6A2,2,0,0,0,4,6V8.69l-1.9,1.9a2,2,0,0,0,0,2.82L4,15.31V18a2,2,0,0,0,2,2H8.69l1.9,1.9a2,2,0,0,0,2.82,0l1.9-1.9H18a2,2,0,0,0,2-2V15.31l1.9-1.9A2,2,0,0,0,21.9,10.59ZM12,16a4,4,0,1,1,4-4A4,4,0,0,1,12,16Z"/>
+      </svg>
+    </button>
+
+    <div class="user-chip"><span id="chipAv"></span><span id="chipName"></span><button id="signOutBtn">Sign out</button></div>
+  </header>
+
+  <div class="view-banner" id="viewBanner" hidden>
+    <span id="vbText"></span>
+    <button id="vbBack">← Back to my journal</button>
+  </div>
+
+  <div class="controls">
+    <div class="year-nav">
+      <button id="yearPrev">‹</button><span class="yr" id="yearLabel"></span><button id="yearNext">›</button>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="stEntries">0</div><div class="l">Entries</div></div>
+      <div class="stat"><div class="n" id="stStreak">0</div><div class="l">Day streak</div></div>
+      <div class="stat"><div class="n" id="stWords">0</div><div class="l">Words</div></div>
+      <div class="stat"><div class="n" id="stMood">—</div><div class="l">Prevailing hue</div></div>
+    </div>
+    <button id="todayBtn">＋ Today's Entry</button>
+  </div>
+
+  <div class="hm-card">
+    <div id="emptyBar"><span>This year is still blank.</span><button id="sampleBtn">Load a sample year</button><span style="font-size:12px">(demo data — clear anytime from Settings)</span></div>
+    <div class="hm-scroll">
+      <div class="hm-months" id="months"></div>
+      <div class="hm-row">
+        <div class="hm-dow" id="dow"></div>
+        <div id="grid"></div>
+      </div>
+    </div>
+    <div class="hm-foot">
+      <span style="color:var(--dys)">Dysphoric</span><span class="spectrum-bar"></span><span style="color:var(--euph)">Euphoric</span>
+      <span class="hint">click any day to open it · blank = unwritten · ivory corner = sticky note</span>
+    </div>
+  </div>
+</section>
+
+<!-- day modal -->
+<div class="overlay" id="dayOverlay">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <div class="d-date" id="dmDate"></div>
+    <div id="dmEntry">
+      <div class="spec-track"><div class="spec-marker" id="dmMarker"></div></div>
+      <div class="spec-ends"><span>Dysphoric</span><span>Euphoric</span></div>
+      <div class="mood-line"><span class="mood-chip" id="dmMood"></span></div>
+      <div class="entry-text" id="dmText"></div>
+      <div class="meta" id="dmMeta"></div>
+      <div class="modal-actions" id="dmActs">
+        <button id="dmEdit">✎ Edit entry</button>
+        <button id="dmDel" class="danger">Delete</button>
+      </div>
+    </div>
+    <div id="dmBlank" class="blank-day" hidden>
+      <div class="big">A quiet day.</div>
+      <p id="dmBlankTxt">Nothing was written here — the box stays blank.</p>
+      <div class="modal-actions" style="justify-content:center"><button id="dmWrite" style="background:var(--today);border-color:var(--today);color:#06170b">Write this day</button></div>
+    </div>
+    <div id="dmStickZone">
+      <div class="sticky-note" id="dmStick" hidden>
+        <div class="sn-head"><span>🗒 sticky note</span><button id="dmStickDel">remove</button></div>
+        <div id="dmStickText"></div>
+      </div>
+      <div class="modal-actions" id="dmStickAddWrap"><button id="dmStickAdd" style="background:var(--ivory);border-color:var(--ivory);color:#4a3f26">🗒  Sticky note</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- editor modal -->
+<div class="overlay" id="edOverlay">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <div class="d-date" id="edDate"></div>
+    <textarea id="edText" placeholder="How did this day feel? Write freely — about 250 words."></textarea>
+    <div class="ed-foot">
+      <span id="edCount">0 / 250 words</span><span class="spacer"></span>
+      <button id="edStick" title="Add a sticky note (never analyzed)">🗒＋</button>
+      <button class="ghost-btn" style="width:auto;padding:10px 18px" id="edCancel">Cancel</button>
+      <button class="primary-btn" style="width:auto;margin:0;padding:11px 22px" id="edSave">Analyze &amp; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- sticky note modal -->
+<div class="overlay" id="stickOverlay">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <div class="d-date" id="skDate"></div>
+    <textarea id="skText" placeholder="Quick note — a to-do, an address, a link… (about 100 words, never analyzed)"></textarea>
+    <div class="ed-foot">
+      <span id="skCount">0 / 100 words</span><span class="spacer"></span>
+      <button class="ghost-btn" style="width:auto;padding:10px 18px" id="skCancel">Cancel</button>
+      <button class="primary-btn" style="width:auto;margin:0;padding:11px 22px;background:var(--ivory);color:#4a3f26" id="skSave">Pin note</button>
+    </div>
+  </div>
+</div>
+
+<!-- settings modal -->
+<div class="overlay" id="setOverlay">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <div class="d-date">Settings</div>
+
+    <div class="set-sec">Profile</div>
+    <div class="settings-row"><div><div class="t">Profile picture</div><div class="s">Upload your own — otherwise your mail's picture is used, or your name's initial.</div></div>
+      <div class="pf-line"><span id="pfAv"></span><label class="file-label">Upload<input type="file" id="pfPic" accept="image/*" hidden></label><button id="pfPicRm">Remove</button></div></div>
+    <div class="settings-row"><div><div class="t">Profile name</div><div class="s">Shown on your profile & avatar initial.</div></div>
+      <div class="pf-line"><input id="pfName" type="text" placeholder="Display name"><button id="pfNameSave">Save</button></div></div>
+    <div class="settings-row"><div><div class="t">Username <span style="color:var(--mut);font-weight:400">(unique)</span></div><div class="s" id="pfUserHint">Letters, numbers and - _ &lt; ^ &gt; only.</div></div>
+      <div class="pf-line"><input id="pfUser" type="text" placeholder="unique-username"><button id="pfUserSave">Save</button></div></div>
+
+    <div class="set-sec">Privacy</div>
+    <div class="settings-row"><div><div class="t">Dashboard visible to</div><div class="s">Who can open your year grid.</div></div>
+      <div class="pills" id="dvRow"><button class="pill" data-v="none">None</button><button class="pill" data-v="mates">Only Mates</button><button class="pill" data-v="all">All</button></div></div>
+    <div class="settings-row"><div><div class="t">Journal entries visible to</div><div class="s">Entries can never be public — None or Mates only.</div></div>
+      <div class="pills" id="evRow"><button class="pill" data-v="none">None</button><button class="pill" data-v="mates">Only Mates</button></div></div>
+
+    <div class="set-sec">Social</div>
+    <div class="settings-row"><div><div class="t">Mates</div><div class="s">Search users, send / accept Mate requests, view Mates' journals.</div></div>
+      <button id="openMates2">Open Mates</button></div>
+
+    <div class="set-sec">Engine & data</div>
+    <div class="settings-row"><div><div class="t">Mood engine</div><div class="s" id="engineState"></div></div></div>
+    <div class="settings-row"><div><div class="t">Gemini API key <span style="color:var(--mut);font-weight:400">(optional, free)</span></div>
+      <div class="s">LLM interpretation via Google Gemini — aistudio.google.com/apikey</div></div>
+      <div class="pf-line"><input id="gemKey" type="password" placeholder="AIza..."><button id="gemSave">Save</button><button id="gemRemove">Remove</button></div></div>
+    <div class="settings-row"><div><div class="t">Cloud sync</div><div class="s" id="cloudInfo"></div></div></div>
+    <div class="settings-row"><div><div class="t">Sample data</div><div class="s">Demo entries to preview the grid.</div></div>
+      <div class="pf-line"><button id="sSample">Load samples</button><button id="sClearS">Clear samples</button></div></div>
+    <div class="settings-row"><div><div class="t" style="color:#ff8484">Danger zone</div><div class="s">Delete every entry & note on this device.</div></div>
+      <button id="sClearAll">Clear all</button></div>
+  </div>
+</div>
+
+<!-- mates modal -->
+<div class="overlay" id="matesOverlay">
+  <div class="modal">
+    <button class="x" data-close>✕</button>
+    <div class="d-date">Mates</div>
+    <div class="m-search"><input id="mSearch" placeholder="search by username…"><button id="mGo">Find</button></div>
+    <div id="mResult"></div>
+    <div class="m-sec">Incoming requests</div><div id="mIn"></div>
+    <div class="m-sec">Sent requests</div><div id="mOut"></div>
+    <div class="m-sec">Your Mates</div><div id="mList"></div>
+  </div>
+</div>
+
+<div id="tip"></div>
+<div id="toast"></div>
+
+<script type="module">
+/* ══════════ ☁ FIREBASE CONFIG (free tier) — paste web-app config for cross-device sync ══════════ */
+const FIREBASE_CONFIG = {
+  apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", 
+  authDomain:"huemore.firebaseapp.com", 
+  projectId:"huemore", 
+  storageBucket:"huemore.firebasestorage.app", 
+  messagingSenderId:"700576442367", 
+  appId:"1:700576442367:web:fb37e1692e29c6ba56e9ca" 
+};
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const LS={users:'hm.users',session:'hm.session',data:u=>'hm.data.'+u,stick:u=>'hm.stick.'+u,key:'hm.gemini',
+  profiles:'hm.profiles',requests:'hm.requests',mates:'hm.mates'};
+const state={user:null,myId:null,email:'',displayName:'',profile:null,entries:{},stickies:{},viewYear:new Date().getFullYear(),viewing:null};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- utils ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const keyOf=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseKey=k=>{const[a,b,c]=k.split('-').map(Number);return new Date(a,b-1,c)};
+const todayKey=()=>keyOf(new Date());
+const fmtLong=d=>d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+const fmtShort=d=>d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+const wordCount=t=>(t.trim().match(/\S+/g)||[]).length;
+const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
+const isLeap=y=>(y%4===0&&y%100!==0)||y%400===0;
+
+/* ---------- spectrum (RGB lerp) ---------- */
+const EUPHORIC_RGB=[255,176,32], DYSPHORIC_RGB=[46,143,232];
+function lerpColor(t){t=Math.max(0,Math.min(1,t));
+  const r=Math.round(DYSPHORIC_RGB[0]+(EUPHORIC_RGB[0]-DYSPHORIC_RGB[0])*t);
+  const g=Math.round(DYSPHORIC_RGB[1]+(EUPHORIC_RGB[1]-DYSPHORIC_RGB[1])*t);
+  const b=Math.round(DYSPHORIC_RGB[2]+(EUPHORIC_RGB[2]-DYSPHORIC_RGB[2])*t);
+  return `rgb(${r}, ${g}, ${b})`;}
+function moodLabel(s){if(s>=.85)return"Euphoric";if(s>=.65)return"Bright";if(s>=.55)return"Lifted";
+  if(s>=.45)return"Even";if(s>=.35)return"Heavy";if(s>=.15)return"Low";return"Dysphoric";}
+
+/* ---------- ✍️ pen animation ---------- */
+(function penWriter(){
+  const path=$('#writePath'),pen=$('#pen');if(!path||!pen)return;
+  const L=path.getTotalLength();path.style.strokeDasharray=L;
+  const DUR=6500,W=.55,H=.8,F=.92,t0=performance.now();
+  (function frame(now){
+    const t=((now-t0)%DUR)/DUR;let p,penOp,lineOp,off;
+    if(t<W){p=t/W;penOp=1;lineOp=1;off=L*(1-p)}
+    else if(t<H){p=1;penOp=1;lineOp=1;off=0}
+    else if(t<F){p=1;penOp=1;lineOp=1-(t-H)/(F-H);off=0}
+    else{p=0;penOp=0;lineOp=0;off=L}
+    path.style.strokeDashoffset=off;path.style.opacity=lineOp;pen.style.opacity=penOp;
+    const pt=path.getPointAtLength(L*p);pen.setAttribute('transform',`translate(${pt.x},${pt.y})`);
+    requestAnimationFrame(frame);
+  })(t0);
+})();
+
+/* ---------- sentiment ---------- */
+const POS={ecstatic:3,euphoric:3,thrilled:3,elated:3,overjoyed:3,blissful:3,amazing:3,incredible:3,fantastic:3,unbelievable:2,blessed:2,happy:2,joyful:2,excited:2,grateful:2,proud:2,wonderful:2,awesome:2,brilliant:2,delighted:2,energized:2,inspired:2,accomplished:2,celebrated:2,loved:2,laughed:2,laughing:2,fun:2,bright:1,smiled:1,smiling:1,good:1,great:2,nice:1,calm:1,peaceful:1,hopeful:1,relaxed:1,cozy:1,pleasant:1,win:1,won:1,enjoyed:1,content:1,steady:1,okay:1};
+const NEG={devastated:3,miserable:3,awful:3,terrible:3,horrible:3,crushed:3,hopeless:3,despair:3,unbearable:3,panic:3,panicking:3,worst:3,hated:2,sad:2,angry:2,anxious:2,stressed:2,exhausted:2,lonely:2,depressed:2,frustrated:2,upset:2,cried:2,crying:2,overwhelmed:2,disappointed:2,worried:2,worry:1,scared:2,drained:2,sick:2,pain:2,painful:2,broke:2,failed:2,failure:2,argued:2,fight:2,tired:1,bored:1,nervous:1,annoyed:1,alone:1,heavy:1,struggled:1,restless:1,meh:1,dull:1,blank:1};
+const NEGATORS=new Set(['not','no','never',"don't",'dont',"didn't",'didnt',"can't",'cant',"couldn't",'couldnt',"wasn't",'wasnt',"isn't",'isnt',"ain't",'aint','hardly','barely','without','nothing']);
+const BOOST=new Set(['very','really','so','extremely','super','incredibly','totally','deeply','truly','too']);
+function lexiconScore(text){
+  const w=text.toLowerCase().replace(/[^a-z'\s]/g,' ').split(/\s+/).filter(Boolean);let sum=0;
+  w.forEach((tok,i)=>{const p=POS[tok],n=NEG[tok];if(!p&&!n)return;let v=p?p:-n;
+    if(i>0&&BOOST.has(w[i-1]))v*=1.5;
+    if(i>0&&NEGATORS.has(w[i-1]))v*=-.6;else if(i>1&&NEGATORS.has(w[i-2]))v*=-.6;
+    sum+=v;});
+  return .5+Math.tanh(sum/8)/2;
+}
+async function llmScore(text){
+  const key=localStorage.getItem(LS.key);if(!key)return null;
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({contents:[{parts:[{text:`You are a mood analyzer for a personal journal. Respond ONLY with JSON: {"score": <0.0–1.0, 0 = deeply dysphoric, 1 = euphoric>, "mood": "<1-2 word label>"}. Entry:\n"""${text}"""`}]}],generationConfig:{temperature:.2,responseMimeType:'application/json'}})});
+  if(!r.ok)throw new Error(r.status);
+  const j=await r.json();
+  const out=JSON.parse(j.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim());
+  const s=clamp(+out.score);return{score:s,mood:out.mood||moodLabel(s),engine:'LLM · Gemini'};
+}
+async function analyze(text){
+  try{const r=await llmScore(text);if(r)return r}catch(e){}
+  const s=lexiconScore(text);return{score:s,mood:moodLabel(s),engine:'Lexicon'};
+}
+
+/* ---------- avatar ---------- */
+function avatarHTML(p,sz=34){
+  const init=esc(((p?.name||p?.email||'?').trim().charAt(0)||'?').toUpperCase());
+  const src=p?.pic||(p?.email?`https://unavatar.io/google/${encodeURIComponent(p.email)}`:'');
+  return `<span class="avatar" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.45)}px">
+    <span class="av-init">${init}</span>${src?`<img class="av-img" src="${src}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">`:''}</span>`;
+}
+function fileToPic(file){return new Promise(res=>{const fr=new FileReader();
+  fr.onload=()=>{const img=new Image();img.onload=()=>{const s=Math.min(img.width,img.height);
+    const c=document.createElement('canvas');c.width=128;c.height=128;
+    c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,128,128);
+    res(c.toDataURL('image/jpeg',.82))};img.src=fr.result};fr.readAsDataURL(file)})}
+
+/* ---------- local social stores ---------- */
+const getLP=()=>JSON.parse(localStorage.getItem(LS.profiles)||'{}');
+const setLP=m=>localStorage.setItem(LS.profiles,JSON.stringify(m));
+const getLR=()=>JSON.parse(localStorage.getItem(LS.requests)||'[]');
+const setLR=a=>localStorage.setItem(LS.requests,JSON.stringify(a));
+const getLM=()=>JSON.parse(localStorage.getItem(LS.mates)||'[]');
+const setLM=a=>localStorage.setItem(LS.mates,JSON.stringify(a));
+
+/* ---------- unified social API ---------- */
+async function profGet(id){
+  if(fb){const d=await fb.F.getDoc(fb.F.doc(fb.db,'profiles',id));return d.exists()?d.data():null}
+  return getLP()[id]||null;
+}
+async function profSave(p){
+  if(fb){await fb.F.setDoc(fb.F.doc(fb.db,'profiles',p.id),p)}
+  else{const m=getLP();m[p.id]=p;setLP(m)}
+}
+async function profByUsername(un){
+  un=String(un).toLowerCase();
+  if(fb){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'profiles'),fb.F.where('unameLower','==',un)));
+    return s.empty?null:s.docs[0].data()}
+  return Object.values(getLP()).find(p=>p.unameLower===un)||null;
+}
+const snapProf=p=>({id:p.id,email:p.email||'',name:p.name||'',username:p.username||'',pic:p.pic||null});
+const reqId=(a,b)=>a+'__'+b;
+async function reqSend(toProf){
+  const r={id:reqId(state.myId,toProf.id),from:state.myId,to:toProf.id,fp:snapProf(state.profile),ts:Date.now()};
+  if(fb){await fb.F.setDoc(fb.F.doc(fb.db,'requests',r.id),r)}
+  else{const a=getLR();if(!a.some(x=>x.id===r.id)){a.push(r);setLR(a)}}
+}
+async function reqIn(){
+  if(fb){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'requests'),fb.F.where('to','==',state.myId)));return s.docs.map(d=>d.data())}
+  return getLR().filter(r=>r.to===state.myId);
+}
+async function reqOut(){
+  if(fb){const s=await fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'requests'),fb.F.where('from','==',state.myId)));return s.docs.map(d=>d.data())}
+  return getLR().filter(r=>r.from===state.myId);
+}
+async function reqDelete(r){
+  if(fb){await fb.F.deleteDoc(fb.F.doc(fb.db,'requests',r.id))}
+  else setLR(getLR().filter(x=>x.id!==r.id));
+}
+async function reqAccept(r){
+  const [a,b]=[state.myId,r.from].sort();
+  const mine=snapProf(state.profile);
+  const m={id:a+'~'+b,a,b,pa:a===state.myId?mine:r.fp,pb:a===state.myId?r.fp:mine,ts:Date.now()};
+  if(fb){await fb.F.setDoc(fb.F.doc(fb.db,'mates',m.id),m);await fb.F.deleteDoc(fb.F.doc(fb.db,'requests',r.id))}
+  else{const lm=getLM();if(!lm.some(x=>x.id===m.id))lm.push(m);setLM(lm);setLR(getLR().filter(x=>x.id!==r.id))}
+}
+async function matesList(){
+  if(fb){const[q1,q2]=await Promise.all([
+    fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'mates'),fb.F.where('a','==',state.myId))),
+    fb.F.getDocs(fb.F.query(fb.F.collection(fb.db,'mates'),fb.F.where('b','==',state.myId)))]);
+    return[...q1.docs,...q2.docs].map(d=>d.data())}
+  return getLM().filter(m=>m.a===state.myId||m.b===state.myId);
+}
+const mateOther=m=>m.a===state.myId?{id:m.b,...m.pb}:{id:m.a,...m.pa};
+async function mateRemove(m){
+  if(fb){await fb.F.deleteDoc(fb.F.doc(fb.db,'mates',m.id))}
+  else setLM(getLM().filter(x=>x.id!==m.id));
+}
+async function areMates(id){return (await matesList()).some(m=>m.a===id||m.b===id)}
+
+/* ---------- entries / stickies storage ---------- */
+const readLocal=u=>JSON.parse(localStorage.getItem(LS.data(u))||'{}');
+const saveLocal=()=>localStorage.setItem(LS.data(state.user),JSON.stringify(state.entries));
+const readLocalS=u=>JSON.parse(localStorage.getItem(LS.stick(u))||'{}');
+const saveLocalS=()=>localStorage.setItem(LS.stick(state.user),JSON.stringify(state.stickies));
+async function persistEntry(k,e){saveLocal();
+  if(fb&&fb.user){try{await fb.F.setDoc(fb.F.doc(fb.db,'users',fb.user.uid,'entries',k),e)}catch(err){toast('Cloud sync failed — saved on this device')}}}
+async function removeEntry(k){delete state.entries[k];saveLocal();
+  if(fb&&fb.user){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.user.uid,'entries',k))}catch(e){}}
+  renderGrid(false);renderStats();}
+async function persistSticky(k,v){
+  if(v){state.stickies[k]=v;saveLocalS();
+    if(fb&&fb.user){try{await fb.F.setDoc(fb.F.doc(fb.db,'users',fb.user.uid,'stickies',k),v)}catch(e){}}}
+  else{delete state.stickies[k];saveLocalS();
+    if(fb&&fb.user){try{await fb.F.deleteDoc(fb.F.doc(fb.db,'users',fb.user.uid,'stickies',k))}catch(e){}}}
+  renderGrid(false);
+}
+async function loadCloud(){
+  const[se,ss]=await Promise.all([
+    fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'entries')),
+    fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'stickies'))]);
+  se.forEach(d=>{const c=d.data(),l=state.entries[d.id];if(!l||(c.ts||0)>(l.ts||0))state.entries[d.id]=c});
+  ss.forEach(d=>{state.stickies[d.id]=d.data()});
+  saveLocal();saveLocalS();
+}
+async function fetchUserData(id){
+  if(fb){const s=await fb.F.getDocs(fb.F.collection(fb.db,'users',id,'entries'));
+    const o={};s.forEach(d=>o[d.id]=d.data());return o}
+  return readLocal(id);
+}
+
+/* ---------- firebase ---------- */
+let fb=null;
+async function initFirebase(){
+  if(!FIREBASE_CONFIG.apiKey)return;
+  try{
+    const[appM,A,F]=await Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')]);
+    const app=appM.initializeApp(FIREBASE_CONFIG);
+    fb={A,F,auth:A.getAuth(app),db:F.getFirestore(app),user:null};
+    await new Promise(res=>A.onAuthStateChanged(fb.auth,u=>{fb.user=u;res()}));
+  }catch(e){console.warn('Firebase unavailable:',e);fb=null}
+}
+
+/* ---------- local accounts ---------- */
+async function sha(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return'x'+(h>>>0)}}
+const getUsers=()=>JSON.parse(localStorage.getItem(LS.users)||'{}');
+const friendly=e=>({'auth/email-already-in-use':'That email already has an account.','auth/invalid-credential':'Wrong email or password.',
+  'auth/user-not-found':'No account found for that email.','auth/wrong-password':'Wrong email or password.',
+  'auth/weak-password':'Password must be at least 6 characters.','auth/invalid-email':'That email looks invalid.'}[e?.code]||e?.message||'Something went wrong.');
+const UN_RE=/^[A-Za-z0-9_\-<^>]{3,20}$/;
+
+/* ---------- toast / tip ---------- */
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800)}
+const tip=$('#tip');
+function showTip(el){if(!el.dataset.tip)return;tip.textContent=el.dataset.tip;
+  const r=el.getBoundingClientRect();tip.style.left=r.left+r.width/2+'px';tip.style.top=r.top-9+'px';tip.style.opacity=1}
+function hideTip(){tip.style.opacity=0}
+
+/* ---------- overlays ---------- */
+const overlays=$$('.overlay');
+function openOv(el){el.classList.add('show')}
+function closeOv(el){el.classList.remove('show')}
+overlays.forEach(o=>o.addEventListener('click',e=>{if(e.target===o||e.target.closest('[data-close]'))closeOv(o)}));
+addEventListener('keydown',e=>{if(e.key==='Escape')overlays.forEach(closeOv)});
+
+/* ---------- auth UI ---------- */
+let mode='in';
+$('#tabIn').onclick=()=>setMode('in');$('#tabUp').onclick=()=>setMode('up');
+function setMode(m){mode=m;$('#tabIn').classList.toggle('on',m==='in');$('#tabUp').classList.toggle('on',m==='up');
+  $('#nameRow').hidden=m==='in';$('#userRow').hidden=m==='in';
+  $('#authSubmit').textContent=m==='in'?'Sign in':'Create my journal'}
+$('#authForm').addEventListener('submit',async e=>{
+  e.preventDefault();const btn=$('#authSubmit'),err=$('#authErr');err.textContent='';
+  const email=$('#authEmail').value.trim().toLowerCase(),pass=$('#authPass').value,
+        name=$('#authName').value.trim(),uname=$('#authUser').value.trim();
+  if(uname&&!UN_RE.test(uname)){err.textContent='Username: 3–20 chars — letters, numbers and - _ < ^ > only.';return}
+  btn.disabled=true;
+  try{
+    if(uname){const ex=await profByUsername(uname);if(ex){err.textContent='That username is taken.';btn.disabled=false;return}}
+    if(fb){
+      mode==='up'?await fb.A.createUserWithEmailAndPassword(fb.auth,email,pass)
+                :await fb.A.signInWithEmailAndPassword(fb.auth,email,pass);
+      state.pendingUsername=uname;localStorage.setItem(LS.session,'cloud');await enterApp();
+    }else{
+      const users=getUsers();
+      if(mode==='up'){
+        if(users[email])throw{message:'That email already has an account on this device.'};
+        const salt=Math.random().toString(36).slice(2);
+        users[email]={name:name||email.split('@')[0],salt,hash:await sha(salt+pass)};
+        localStorage.setItem(LS.users,JSON.stringify(users));
+        state.pendingUsername=uname;
+      }else{
+        const u=users[email];
+        if(!u||u.hash!==await sha(u.salt+pass))throw{message:'Wrong email or password.'};
+      }
+      localStorage.setItem(LS.session,'local:'+email);await enterApp();
+    }
+  }catch(x){err.textContent=friendly(x)}
+  btn.disabled=false;
+});
+$('#guestBtn').onclick=async()=>{localStorage.setItem(LS.session,'guest');await enterApp()};
+
+/* ---------- enter app ---------- */
+async function ensureProfile(){
+  let p=await profGet(state.myId);
+  if(!p){p={id:state.myId,email:state.email,name:state.displayName,username:'',unameLower:'',pic:null,
+    dashVis:'none',entryVis:'none',ts:Date.now()};
+    if(state.pendingUsername&&UN_RE.test(state.pendingUsername)){
+      const ex=await profByUsername(state.pendingUsername);
+      if(!ex){p.username=state.pendingUsername;p.unameLower=state.pendingUsername.toLowerCase()}}
+    await profSave(p);
+  }
+  state.profile=p;
+}
+async function enterApp(){
+  if(fb&&fb.user){state.myId=fb.user.uid;state.email=fb.user.email||'';state.user='cloud:'+state.email;
+    state.displayName=state.email.split('@')[0];
+    state.entries=readLocal(state.user);state.stickies=readLocalS(state.user);
+    await ensureProfile();state.displayName=state.profile.name||state.displayName;
+    try{await loadCloud()}catch(e){toast('Could not reach cloud — showing local copy')}}
+  else{
+    state.user=localStorage.getItem(LS.session);if(!state.user)return;
+    if(state.user==='guest'){state.myId='guest';state.email='';state.displayName='Guest'}
+    else{state.myId=state.user.slice(6);state.email=state.myId;state.displayName=getUsers()[state.myId]?.name||state.myId.split('@')[0]}
+    state.entries=readLocal(state.user);state.stickies=readLocalS(state.user);
+    await ensureProfile();
+  }
+  state.viewing=null;
+  $('#authView').style.display='none';$('#appView').hidden=false;
+  updateUserChip();renderGrid(true);renderStats();refreshBadge();
+}
+function updateUserChip(){
+  const p=state.profile||{};
+  $('#chipAv').innerHTML=avatarHTML({...p,email:state.email,name:state.displayName},26);
+  $('#chipName').textContent=`${state.displayName}${p.username?' @'+p.username:''}`;
+}
+async function refreshBadge(){
+  try{const n=(await reqIn()).length;const b=$('#reqBadge');b.hidden=!n;b.textContent=n}catch(e){}
+}
+$('#signOutBtn').onclick=async()=>{
+  if(fb&&fb.user){try{await fb.A.signOut(fb.auth)}catch(e){}}
+  localStorage.removeItem(LS.session);location.reload();};
+
+/* ---------- data source ---------- */
+const SRC=()=>state.viewing?state.viewing.entries:state.entries;
+
+/* ---------- heatmap ---------- */
+function renderGrid(animate=true){
+  const y=state.viewYear,grid=$('#grid'),months=$('#months'),src=SRC();
+  grid.innerHTML='';months.innerHTML='';$('#yearLabel').textContent=y;
+  const offset=new Date(y,0,1).getDay(),days=isLeap(y)?366:365,weeks=Math.ceil((offset+days)/7);
+  months.style.gridTemplateColumns=`repeat(${weeks},var(--cell))`;
+  let lastM=-1;
+  for(let w=0;w<weeks;w++){
+    const di=w*7-offset,m=di<0?0:parseKey(keyOf(new Date(y,0,1+di))).getMonth();
+    if(m!==lastM){const s=document.createElement('span');
+      s.textContent=new Date(y,m,1).toLocaleDateString('en-US',{month:'short'});
+      s.style.gridColumnStart=w+1;months.appendChild(s);lastM=m}
+  }
+  const tK=todayKey();
+  for(let i=0;i<offset;i++){const p=document.createElement('span');p.className='cell pad';grid.appendChild(p)}
+  for(let i=0;i<days;i++){
+    const d=new Date(y,0,1+i),k=keyOf(d),e=src[k],b=document.createElement('button');
+    b.className='cell';b.dataset.date=k;b.type='button';
+    if(k>tK){b.classList.add('future');b.tabIndex=-1}
+    else if(e){b.style.backgroundColor=e.color;b.dataset.tip=`${fmtShort(d)} · ${e.mood}`}
+    else{b.classList.add('empty');b.dataset.tip=`${fmtShort(d)} · no entry`}
+    if(!state.viewing&&state.stickies[k])b.appendChild(Object.assign(document.createElement('i'),{className:'stick'}));
+    if(!state.viewing&&k===tK)b.classList.add('today');
+    if(animate){b.classList.add('in');b.style.animationDelay=(Math.floor((offset+i)/7)*4+(i%7)*10)+'ms'}
+    grid.appendChild(b);
+  }
+  const hasYear=Object.keys(src).some(k=>k.startsWith(y+'-'));
+  $('#emptyBar').style.display=(!state.viewing&&!hasYear)?'flex':'none';
+}
+$('#grid').addEventListener('click',e=>{
+  const c=e.target.closest('.cell');if(!c||c.classList.contains('future')||c.classList.contains('pad'))return;
+  hideTip();openDay(c.dataset.date);});
+$('#grid').addEventListener('mouseover',e=>{const c=e.target.closest('.cell');if(c)showTip(c)});
+$('#grid').addEventListener('mouseout',hideTip);
+
+/* ---------- stats ---------- */
+function renderStats(){
+  const y=state.viewYear,src=SRC(),ks=Object.keys(src).filter(k=>k.startsWith(y+'-'));
+  $('#stEntries').textContent=ks.length;
+  $('#stWords').textContent=ks.reduce((a,k)=>a+(src[k].words||0),0).toLocaleString();
+  let streak=0,d=new Date();if(!src[keyOf(d)])d.setDate(d.getDate()-1);
+  while(src[keyOf(d)]){streak++;d.setDate(d.getDate()-1)}
+  $('#stStreak').textContent=streak;
+  if(ks.length){const avg=ks.reduce((a,k)=>a+src[k].score,0)/ks.length;
+    $('#stMood').innerHTML=`<span class="mood-chip" style="background:${lerpColor(avg)}">${moodLabel(avg)}</span>`}
+  else $('#stMood').textContent='—';
+  $('#todayBtn').style.display=state.viewing?'none':'';
+  updateTodayBtn();
+}
+function updateTodayBtn(){if(!state.viewing)$('#todayBtn').textContent=state.entries[todayKey()]?'❮ Open today\u2019s entry':'＋ Today\u2019s Entry'}
+$('#todayBtn').onclick=()=>{const k=todayKey();state.entries[k]?openDay(k):openEditor(k)};
+function changeYear(d){const el=$('#yearLabel');if(el.classList.contains('flip'))return;
+  el.classList.add('flip');setTimeout(()=>{state.viewYear+=d;renderGrid(true);renderStats()},200);
+  el.addEventListener('animationend',()=>el.classList.remove('flip'),{once:true})}
+$('#yearPrev').onclick=()=>changeYear(-1);
+$('#yearNext').onclick=()=>changeYear(1);
+
+/* ---------- day modal ---------- */
+let dayKey=null;
+function openDay(k){
+  dayKey=k;const viewing=!!state.viewing,src=SRC(),e=src[k];
+  $('#dmDate').textContent=fmtLong(parseKey(k));
+  $('#dmEntry').hidden=!e;$('#dmBlank').hidden=!!e;
+  $('#dmBlankTxt').textContent=viewing?'This day is private.':'Nothing was written here — the box stays blank.';
+  if(e){
+    $('#dmMarker').style.left=(e.score*100)+'%';
+    const chip=$('#dmMood');chip.textContent=e.mood;chip.style.backgroundColor=e.color;
+    $('#dmText').textContent=e.text;$('#dmText').style.borderColor=e.color;
+    $('#dmMeta').innerHTML=`<span>${e.words} words</span><span>·</span><span>engine: ${esc(e.engine||'Lexicon')}</span><span>·</span><span>spectrum ${(e.score*100).toFixed(0)}/100 toward euphoric</span>${e.sample?'<span class="tag">sample</span>':''}`;
+  }
+  $('#dmActs').style.display=viewing?'none':'flex';
+  $('#dmWrite').parentElement.style.display=(!viewing&&k<=todayKey())?'flex':'none';
+  $('#dmStickZone').style.display=viewing?'none':'block';
+  const s=state.stickies[k];
+  $('#dmStick').hidden=!s;
+  if(s)$('#dmStickText').textContent=s.text;
+  $('#dmStickAddWrap').style.display=(!s&&k<=todayKey())?'flex':'none';
+  openOv($('#dayOverlay'));
+}
+$('#dmWrite').onclick=()=>{closeOv($('#dayOverlay'));openEditor(dayKey)};
+$('#dmEdit').onclick=()=>{closeOv($('#dayOverlay'));openEditor(dayKey,state.entries[dayKey].text)};
+$('#dmDel').onclick=async()=>{if(confirm('Delete this entry? The day will go blank.')){closeOv($('#dayOverlay'));await removeEntry(dayKey);toast('Entry deleted')}};
+$('#dmStickAdd').onclick=()=>{closeOv($('#dayOverlay'));openSticky(dayKey)};
+$('#dmStickDel').onclick=async()=>{if(confirm('Remove this sticky note?')){await persistSticky(dayKey,null);closeOv($('#dayOverlay'));openDay(dayKey);toast('Sticky note removed')}};
+
+/* ---------- editor ---------- */
+let editKey=null;const ta=$('#edText');
+function openEditor(k,prefill=''){
+  if(k>todayKey())return;
+  editKey=k;$('#edDate').textContent=fmtLong(parseKey(k));
+  ta.value=prefill;updateCount();openOv($('#edOverlay'));setTimeout(()=>ta.focus(),120);
+}
+function updateCount(){const wc=wordCount(ta.value),c=$('#edCount');
+  c.textContent=`${Math.min(wc,250)} / 250 words`;c.classList.toggle('warn',wc>=230)}
+ta.addEventListener('input',()=>{const wc=wordCount(ta.value);
+  if(wc>250)ta.value=ta.value.trim().split(/\s+/).slice(0,250).join(' ');updateCount()});
+$('#edCancel').onclick=()=>closeOv($('#edOverlay'));
+$('#edStick').onclick=()=>{closeOv($('#edOverlay'));openSticky(editKey)};
+$('#edSave').onclick=async()=>{
+  const text=ta.value.trim();if(!text)return;
+  const btn=$('#edSave');btn.disabled=true;btn.textContent='Reading the mood…';
+  const res=await analyze(text);const color=lerpColor(res.score);
+  const e={text,score:+res.score.toFixed(3),color,mood:res.mood,words:wordCount(text),ts:Date.now(),engine:res.engine};
+  state.entries[editKey]=e;await persistEntry(editKey,e);
+  btn.disabled=false;btn.textContent='Analyze & Save';
+  closeOv($('#edOverlay'));renderGrid(false);renderStats();
+  const cell=$(`#grid [data-date="${editKey}"]`);if(cell){cell.classList.add('pulse');cell.dataset.tip=`${fmtShort(parseKey(editKey))} · ${e.mood}`}
+  toast(`Saved — this day landed on "${res.mood}"`);
+  setTimeout(()=>openDay(editKey),650);
+};
+
+/* ---------- sticky notes ---------- */
+let stickKey=null;const sk=$('#skText');
+function openSticky(k){
+  if(k>todayKey())return;
+  stickKey=k;$('#skDate').textContent='🗒 '+fmtLong(parseKey(k));
+  sk.value=state.stickies[k]?.text||'';skCount();openOv($('#stickOverlay'));setTimeout(()=>sk.focus(),120);
+}
+function skCount(){const wc=wordCount(sk.value),c=$('#skCount');
+  c.textContent=`${Math.min(wc,100)} / 100 words`;c.classList.toggle('warn',wc>=90)}
+sk.addEventListener('input',()=>{const wc=wordCount(sk.value);
+  if(wc>100)sk.value=sk.value.trim().split(/\s+/).slice(0,100).join(' ');skCount()});
+$('#skCancel').onclick=()=>closeOv($('#stickOverlay'));
+$('#skSave').onclick=async()=>{
+  const text=sk.value.trim();if(!text)return;
+  await persistSticky(stickKey,{text,ts:Date.now()});
+  closeOv($('#stickOverlay'));toast('Sticky note pinned — ivory corner added');
+  setTimeout(()=>openDay(stickKey),250);
+};
+
+/* ---------- settings ---------- */
+$('#gearBtn').onclick=()=>{refreshSettings();openOv($('#setOverlay'))};
+function refreshSettings(){
+  const p=state.profile||{};
+  $('#pfAv').innerHTML=avatarHTML({...p,email:state.email,name:state.displayName},44);
+  $('#pfName').value=p.name||state.displayName;
+  $('#pfUser').value=p.username||'';
+  $$('#dvRow .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===(p.dashVis||'none')));
+  $$('#evRow .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===(p.entryVis||'none')));
+  $('#engineState').textContent=localStorage.getItem(LS.key)?'Gemini LLM active (lexicon fallback offline)':'Built-in lexicon analyzer (fully offline)';
+  $('#gemKey').value=localStorage.getItem(LS.key)||'';
+  $('#cloudInfo').textContent=fb&&fb.user?`Synced as ${state.email} — journal follows you anywhere.`:'Local mode. Add the free Firebase config in code for cross-device sync.';
+}
+$('#pfPic').addEventListener('change',async e=>{
+  const f=e.target.files[0];if(!f)return;
+  state.profile.pic=await fileToPic(f);await profSave(state.profile);
+  updateUserChip();refreshSettings();toast('Profile picture updated');e.target.value='';
+});
+$('#pfPicRm').onclick=async()=>{state.profile.pic=null;await profSave(state.profile);updateUserChip();refreshSettings();toast('Picture removed — using default')};
+$('#pfNameSave').onclick=async()=>{
+  const n=$('#pfName').value.trim();if(!n)return;
+  state.profile.name=n;state.displayName=n;await profSave(state.profile);
+  updateUserChip();refreshSettings();toast('Profile name saved');
+};
+$('#pfUserSave').onclick=async()=>{
+  const un=$('#pfUser').value.trim(),hint=$('#pfUserHint');
+  if(!UN_RE.test(un)){hint.textContent='3–20 chars: letters, numbers and - _ < ^ > only.';return}
+  const low=un.toLowerCase();
+  if(low!==(state.profile.unameLower||'')){
+    const ex=await profByUsername(low);
+    if(ex&&ex.id!==state.myId){hint.textContent='That username is already taken.';return}
+  }
+  state.profile.username=un;state.profile.unameLower=low;await profSave(state.profile);
+  hint.textContent='Letters, numbers and - _ < ^ > only.';
+  updateUserChip();toast('Username saved: @'+un);
+};
+$('#dvRow').addEventListener('click',async e=>{
+  const b=e.target.closest('.pill');if(!b)return;
+  state.profile.dashVis=b.dataset.v;await profSave(state.profile);refreshSettings();
+  toast('Dashboard visibility: '+b.textContent);
+});
+$('#evRow').addEventListener('click',async e=>{
+  const b=e.target.closest('.pill');if(!b)return;
+  state.profile.entryVis=b.dataset.v;await profSave(state.profile);refreshSettings();
+  toast('Entry visibility: '+b.textContent);
+});
+$('#gemSave').onclick=()=>{localStorage.setItem(LS.key,$('#gemKey').value.trim());refreshSettings();toast('Gemini key saved')};
+$('#gemRemove').onclick=()=>{localStorage.removeItem(LS.key);$('#gemKey').value='';refreshSettings();toast('Using built-in analyzer')};
+
+/* ---------- viewing ---------- */
+async function viewUser(prof){
+  if(!prof||prof.id===state.myId)return;
+  const isMate=await areMates(prof.id);
+  const ok=prof.dashVis==='all'||(prof.dashVis==='mates'&&isMate);
+  if(!ok){toast('@'+(prof.username||'…')+' keeps this journal private');return}
+  let entries={};
+  if(prof.entryVis==='mates'&&isMate)entries=await fetchUserData(prof.id);
+  state.viewing={profile:prof,entries,isMate};
+  state.viewYear=new Date().getFullYear();
+  $('#viewBanner').hidden=false;
+  $('#vbText').innerHTML=`Viewing <b>@${esc(prof.username||'—')}</b> · ${esc(prof.name||'')} ${isMate?'· Mates':''} — read only`;
+  renderGrid(true);renderStats();closeOv($('#matesOverlay'));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+$('#vbBack').onclick=()=>{state.viewing=null;$('#viewBanner').hidden=true;renderGrid(true);renderStats()};
+
+/* ---------- mates modal ---------- */
+$('#matesBtn').onclick=openMates;$('#openMates2').onclick=()=>{closeOv($('#setOverlay'));openMates()};
+async function openMates(){
+  if(!state.profile?.username){toast('Set a unique username first — Settings → Profile');openOv($('#setOverlay'));refreshSettings();return}
+  openOv($('#matesOverlay'));await refreshMates();
+}
+function userCard(p,acts){
+  return `<div class="u-card">${avatarHTML(p,38)}<div class="u-info"><b>${esc(p.name||'—')}</b><span>@${esc(p.username||'—')}</span></div><div class="u-acts">${acts}</div></div>`;
+}
+async function refreshMates(){
+  const[inn,out,ml]=await Promise.all([reqIn(),reqOut(),matesList()]);
+  const b=$('#reqBadge');b.hidden=!inn.length;b.textContent=inn.length;
+  $('#mIn').innerHTML=inn.length?inn.map(r=>userCard(r.fp,
+    `<button data-act="accept" data-id="${esc(r.from)}">Accept</button><button data-act="decline" data-id="${esc(r.from)}" class="warn">Decline</button>`)).join('')
+    :'<div style="color:var(--mut);font-size:13px;padding:4px 0">No incoming requests.</div>';
+  $('#mOut').innerHTML=out.length?out.map(r=>userCard(r.fp,
+    `<button data-act="cancel" data-id="${esc(r.to)}" class="warn">Cancel</button>`)).join('')
+    :'<div style="color:var(--mut);font-size:13px;padding:4px 0">No pending sent requests.</div>';
+  $('#mList').innerHTML=ml.length?ml.map(m=>{const o=mateOther(m);return userCard(o,
+    `<button data-act="view" data-id="${esc(o.id)}" class="go">View journal</button><button data-act="unmate" data-id="${esc(m.id)}" class="warn">Remove</button>`)}).join('')
+    :'<div style="color:var(--mut);font-size:13px;padding:4px 0">No Mates yet — search above.</div>';
+}
+$('#mGo').onclick=async()=>{
+  const un=$('#mSearch').value.trim();if(!un)return;
+  const p=await profByUsername(un);const R=$('#mResult');
+  if(!p){R.innerHTML='<div style="color:var(--mut);font-size:13px;padding:6px 0">No user with that username.</div>';return}
+  if(p.id===state.myId){R.innerHTML='<div style="color:var(--mut);font-size:13px;padding:6px 0">That\u2019s you ✨</div>';return}
+  const[isM,out]=await Promise.all([areMates(p.id),reqOut()]);
+  let acts=`<button data-act="view" data-id="${esc(p.id)}" class="go">View journal</button>`;
+  if(isM)acts+=`<button disabled style="opacity:.5">Already Mates</button>`;
+  else if(out.some(r=>r.to===p.id))acts+=`<button disabled style="opacity:.5">Request sent</button>`;
+  else acts+=`<button data-act="sendreq" data-id="${esc(p.id)}">＋ Send Mate request</button>`;
+  R.innerHTML=userCard(p,acts);
+};
+$('#matesOverlay').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const act=b.dataset.act,id=b.dataset.id;
+  if(act==='sendreq'){const p=await profGet(id);if(p){await reqSend(p);toast('Mate request sent to @'+(p.username||'…'))}}
+  if(act==='accept'){const r=(await reqIn()).find(x=>x.from===id);if(r){await reqAccept(r);toast('You are now Mates 🎉')}}
+  if(act==='decline'){const r=(await reqIn()).find(x=>x.from===id);if(r)await reqDelete(r)}
+  if(act==='cancel'){const r=(await reqOut()).find(x=>x.to===id);if(r)await reqDelete(r)}
+  if(act==='unmate'){if(confirm('Remove this Mate?')){await mateRemove({id});toast('Mate removed')}}
+  if(act==='view'){const p=await profGet(id);await viewUser(p);return}
+  await refreshMates();
+});
+
+/* ---------- samples ---------- */
+const SAMPLES={
+ bright:["One of those rare days where everything felt light. Morning coffee, a long walk, then good news in the evening. I kept smiling for no reason.","Laughed until my stomach hurt with old friends tonight. The kind of joy that stays with you long after midnight.","Finished the big task ahead of time and it felt incredible. Celebrated with my favourite meal and zero guilt.","Sunshine, music in my ears, and a small win at work. Grateful doesn't even begin to cover it."],
+ mid:["A quiet, ordinary day. Some errands, some reading, an early night. Nothing dramatic — and honestly, that was nice.","Mixed feelings today. Productive morning, but a strange heaviness by evening. Hoping tomorrow is brighter.","Mostly routine tasks from start to finish. Felt okay — not great, not low. Just steady.","Spent the afternoon wandering without a plan. Sometimes the unstructured hours are the ones you remember."],
+ low:["A heavy day. Everything felt like effort, and I couldn't shake the worry sitting on my chest all evening.","Slept badly and it followed me around all day. Snapped at small things. Glad it's finally over.","Felt lonely tonight, even in a crowded room. Some days the quiet gets too loud.","Stress piled up from every direction at once. I survived it — but barely."]};
+function loadSamples(){
+  const today=new Date();let d=new Date(state.viewYear,0,1),t=.5+Math.random()*.25;
+  while(d<today&&d.getFullYear()===state.viewYear){
+    if(Math.random()<.62&&keyOf(d)!==todayKey()){
+      t=clamp(t+(Math.random()-.5)*.22);const s=clamp(t+(Math.random()-.5)*.12);
+      const arr=s>.63?SAMPLES.bright:s<.37?SAMPLES.low:SAMPLES.mid;
+      const text=arr[Math.floor(Math.random()*arr.length)];
+      state.entries[keyOf(d)]={text,score:+s.toFixed(3),color:lerpColor(s),mood:moodLabel(s),words:wordCount(text),ts:Date.now(),engine:'Lexicon',sample:true};
+    }
+    d.setDate(d.getDate()+1);
+  }
+  saveLocal();renderGrid(true);renderStats();toast('Sample year loaded');
+}
+$('#sampleBtn').onclick=loadSamples;
+$('#sSample').onclick=()=>{closeOv($('#setOverlay'));loadSamples()};
+$('#sClearS').onclick=()=>{Object.keys(state.entries).forEach(k=>{if(state.entries[k].sample)delete state.entries[k]});saveLocal();renderGrid(true);renderStats();toast('Samples cleared')};
+$('#sClearAll').onclick=async()=>{if(!confirm('Delete ALL entries & sticky notes on this device?'))return;
+  if(fb&&fb.user){try{
+    const[se,ss]=await Promise.all([fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'entries')),fb.F.getDocs(fb.F.collection(fb.db,'users',fb.user.uid,'stickies'))]);
+    await Promise.all([...se.docs,...ss.docs].map(d=>fb.F.deleteDoc(d.ref)))}catch(e){}}
+  state.entries={};state.stickies={};saveLocal();saveLocalS();renderGrid(true);renderStats();toast('All cleared')};
+
+/* ---------- boot ---------- */
+(function miniGrid(){const mg=$('#miniGrid');for(let i=0;i<98;i++){const c=document.createElement('i');
+  c.style.backgroundColor=lerpColor(Math.random());c.style.animationDelay=(i*13)+'ms,'+(i*97%4000)+'ms';mg.appendChild(c)}})();
+(async function boot(){
+  const dow=$('#dow');['','Mon','','Wed','','Fri',''].forEach(l=>{const s=document.createElement('span');s.textContent=l;dow.appendChild(s)});
+  await initFirebase();
+  $('#modeTxt').textContent=fb?'Cloud sync enabled — your journal follows you everywhere':'Local device mode — add the free Firebase config for cross-device sync';
+  if(fb)$('#modeBadge').classList.add('cloud');
+  if(fb&&fb.user){await enterApp();return}
+  if(localStorage.getItem(LS.session))await enterApp();
+})();
+</script>
+</body>
+</html>
