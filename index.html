@@ -776,7 +776,7 @@ async function enterApp(){
 function updateUserChip(){
   const p=state.profile||{};
   $('#chipAv').innerHTML=avatarHTML({...p,email:state.email,name:state.displayName},26);
-  $('#chipName').textContent=`${state.displayName}${p.username?' @'+p.username:''}`;
+  $('#chipName').textContent=p.username?'@'+p.username:state.displayName;
 }
 async function refreshBadge(){
   try{const n=(await reqIn()).length;const b=$('#reqBadge');b.hidden=!n;b.textContent=n}catch(e){}
