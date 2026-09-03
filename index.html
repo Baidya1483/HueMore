@@ -1109,5 +1109,10 @@ $('#sClearAll').onclick=async()=>{if(!confirm('Delete ALL entries & sticky notes
   if(localStorage.getItem(LS.session))await enterApp();
 })();
 </script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); });
+}
+</script>
 </body>
 </html>
