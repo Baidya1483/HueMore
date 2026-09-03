@@ -637,7 +637,7 @@ async function profByUsername(un){
 }
 const pubName=p=>(p.nameCustom&&p.name)?p.name:((p.username||'').trim()||'HueMore user');
 const pubProf=p=>({id:p.id,name:pubName(p),username:p.username||'',pic:p.pic||null});
-const snapProf=p=>pubProf(p);;
+const snapProf=p=>pubProf(p);
 const reqId=(a,b)=>a+'__'+b;
 async function reqSend(toProf){
   const r={id:reqId(state.myId,toProf.id),from:state.myId,to:toProf.id,fp:snapProf(state.profile),ts:Date.now()};
