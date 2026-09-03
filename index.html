@@ -964,7 +964,7 @@ $('#pfPic').addEventListener('change',async e=>{
 $('#pfPicRm').onclick=async()=>{state.profile.pic=null;await profSave(state.profile);updateUserChip();refreshSettings();toast('Picture removed — using default')};
 $('#pfNameSave').onclick=async()=>{
   const n=$('#pfName').value.trim();if(!n)return;
-  state.profile.name=n;state.displayName=n;await profSave(state.profile);
+    state.profile.name=n;state.profile.nameCustom=true;state.displayName=n;await profSave(state.profile);
   updateUserChip();refreshSettings();toast('Profile name saved');
 };
 $('#pfUserSave').onclick=async()=>{
