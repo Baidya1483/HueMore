@@ -26,6 +26,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-color:#2a3242 transparent}
 body{background:var(--ink);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
+body.ovl{overflow:hidden}
 #bg{position:fixed;inset:0;z-index:-1;background:
   radial-gradient(900px 620px at 88% 112%,rgba(46,143,232,.16),transparent 62%),
   radial-gradient(820px 540px at 8% -12%,rgba(255,176,32,.11),transparent 60%),var(--ink)}
@@ -150,7 +151,7 @@ button{font-family:inherit;cursor:pointer}
 .hm-foot .spectrum-bar{width:150px}
 .hm-foot .hint{margin-left:auto;font-style:italic}
 
-/* ---------- overlays (flicker-safe: blur shudhu khola modal e) ---------- */
+/* ---------- overlays ---------- */
 .overlay{position:fixed;inset:0;background:rgba(5,8,12,.9);z-index:60;
   display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.show{opacity:1;pointer-events:auto;backdrop-filter:blur(6px)}
@@ -239,7 +240,14 @@ button{font-family:inherit;cursor:pointer}
   #chipName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .user-chip button{flex:none;padding:4px 8px;font-size:11px}
   .overlay{align-items:flex-start;padding-top:3vh}
-  .modal{max-height:94vh}
+  .modal{max-height:94vh;transition:none;transform:none}
+  .ed-foot{flex-wrap:wrap;gap:10px}
+  .ed-foot .spacer{display:none}
+  #edCount,#skCount{flex:1 1 100%}
+  #edStick{flex:0 0 44px}
+  #edCancel,#skCancel{flex:1}
+  #edSave{flex:1.4;width:auto;margin:0}
+  #skSave{flex:1}
 }
 </style>
 </head>
@@ -500,7 +508,7 @@ button{font-family:inherit;cursor:pointer}
 
 <script type="module">
 /* ══════════ ☁ FIREBASE CONFIG — tomar 6 ta value ekhane boshao ══════════ */
-const FIREBASE_CONFIG = { apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", authDomain:"huemore.firebaseapp.com", projectId:"huemore", storageBucket:"huemore.firebasestorage.app", messagingSenderId:"700576442367", appId:"1:700576442367:web:fb37e1692e29c6ba56e9ca" };
+const FIREBASE_CONFIG = { apiKey:"", authDomain:"", projectId:"", storageBucket:"", messagingSenderId:"", appId:"" };
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const LS={users:'hm.users',session:'hm.session',data:u=>'hm.data.'+u,stick:u=>'hm.stick.'+u,key:'hm.gemini',
@@ -519,7 +527,7 @@ const wordCount=t=>(t.trim().match(/\S+/g)||[]).length;
 const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
 const isLeap=y=>(y%4===0&&y%100!==0)||y%400===0;
 
-/* ---------- spectrum (RGB lerp) ---------- */
+/* ---------- spectrum ---------- */
 const EUPHORIC_RGB=[255,176,32], DYSPHORIC_RGB=[46,143,232];
 function lerpColor(t){t=Math.max(0,Math.min(1,t));
   const r=Math.round(DYSPHORIC_RGB[0]+(EUPHORIC_RGB[0]-DYSPHORIC_RGB[0])*t);
@@ -529,7 +537,7 @@ function lerpColor(t){t=Math.max(0,Math.min(1,t));
 function moodLabel(s){if(s>=.85)return"Euphoric";if(s>=.65)return"Bright";if(s>=.55)return"Lifted";
   if(s>=.45)return"Even";if(s>=.35)return"Heavy";if(s>=.15)return"Low";return"Dysphoric";}
 
-/* ---------- ✍️ pen animation ---------- */
+/* ---------- pen animation ---------- */
 (function penWriter(){
   const path=$('#writePath'),pen=$('#pen');if(!path||!pen)return;
   const L=path.getTotalLength();path.style.strokeDasharray=L;
@@ -716,8 +724,8 @@ function hideTip(){tip.style.opacity=0}
 
 /* ---------- overlays ---------- */
 const overlays=$$('.overlay');
-function openOv(el){el.classList.add('show')}
-function closeOv(el){el.classList.remove('show')}
+function openOv(el){el.classList.add('show');document.body.classList.add('ovl')}
+function closeOv(el){el.classList.remove('show');if(!$$('.overlay.show').length)document.body.classList.remove('ovl')}
 overlays.forEach(o=>o.addEventListener('click',e=>{if(e.target===o||e.target.closest('[data-close]'))closeOv(o)}));
 addEventListener('keydown',e=>{if(e.key==='Escape')overlays.forEach(closeOv)});
 
@@ -981,7 +989,7 @@ $('#evRow').addEventListener('click',async e=>{
 $('#gemSave').onclick=()=>{localStorage.setItem(LS.key,$('#gemKey').value.trim());refreshSettings();toast('Gemini key saved')};
 $('#gemRemove').onclick=()=>{localStorage.removeItem(LS.key);$('#gemKey').value='';refreshSettings();toast('Using built-in analyzer')};
 
-/* ---------- 👁 password eye toggle + 🔑 change password ---------- */
+/* ---------- password eye toggle + change password ---------- */
 $$('.pass-eye').forEach(b=>b.addEventListener('click',()=>{
   const i=document.getElementById(b.dataset.eye);if(!i)return;
   const nowText=i.type==='password';
