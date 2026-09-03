@@ -156,7 +156,7 @@ button{font-family:inherit;cursor:pointer}
 .overlay.show{opacity:1;pointer-events:auto;backdrop-filter:blur(6px)}
 .modal{width:min(560px,100%);background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px;
   box-shadow:0 40px 100px rgba(0,0,0,.55);transform:translateY(16px) scale(.97);transition:transform .32s cubic-bezier(.2,.9,.3,1.15);
-  max-height:88vh;overflow-y:auto}
+  max-height:88vh;overflow-y:auto;overflow-x:hidden}
 .overlay.show .modal{transform:none}
 .modal .x{float:right;background:var(--panel2);border:1px solid var(--line);color:var(--mut);width:32px;height:32px;border-radius:8px;font-size:15px;transition:.2s}
 .modal .x:hover{color:var(--text);border-color:rgba(255,255,255,.3)}
@@ -179,7 +179,7 @@ button{font-family:inherit;cursor:pointer}
 #edText{width:100%;min-height:180px;resize:vertical;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
   color:var(--text);padding:16px;font-family:var(--body);font-size:16px;line-height:1.7}
 #edText:focus{outline:none;border-color:rgba(255,176,32,.5)}
-.ed-foot{display:flex;align-items:center;gap:12px;margin-top:12px}
+.ed-foot{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
 #edCount{font-size:13px;color:var(--mut);font-variant-numeric:tabular-nums}
 #edCount.warn{color:var(--euph);font-weight:700}
 .ed-foot .spacer{flex:1}
