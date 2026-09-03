@@ -1049,7 +1049,8 @@ async function openMates(){
   openOv($('#matesOverlay'));await refreshMates();
 }
 function userCard(p,acts){
-  return `<div class="u-card">${avatarHTML(p,38)}<div class="u-info"><b>${esc(p.name||'—')}</b><span>@${esc(p.username||'—')}</span></div><div class="u-acts">${acts}</div></div>`;
+  const q=pubProf(p);
+  return `<div class="u-card">${avatarHTML(q,38)}<div class="u-info"><b>${esc(q.name)}</b><span>@${esc(q.username||'—')}</span></div><div class="u-acts">${acts}</div></div>`;
 }
 async function refreshMates(){
   const[inn,out,ml]=await Promise.all([reqIn(),reqOut(),matesList()]);
