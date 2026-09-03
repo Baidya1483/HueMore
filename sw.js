@@ -1,4 +1,4 @@
-const CACHE = 'huemore-v1';
+const CACHE = 'huemore-v2';
 const CORE = ['/', '/index.html', '/manifest.webmanifest', '/favicon.png', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
