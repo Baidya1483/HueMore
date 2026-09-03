@@ -1,1 +1,19 @@
-
+{
+  "name": "HueMore — a year in colour",
+  "short_name": "HueMore",
+  "description": "Write your day, see your mood as colour. A whole year becomes a beautiful mood map.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0e13",
+  "theme_color": "#0b0e13",
+  "lang": "en",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
