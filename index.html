@@ -5,7 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HueMore — a year in colour</title>
 <link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#0b0e13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HueMore">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Karla:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -20,7 +26,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{scrollbar-color:#2a3242 transparent}
 body{background:var(--ink);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden}
-/* ✅ flicker fix: static background layers (no fullscreen animation) */
 #bg{position:fixed;inset:0;z-index:-1;background:
   radial-gradient(900px 620px at 88% 112%,rgba(46,143,232,.16),transparent 62%),
   radial-gradient(820px 540px at 8% -12%,rgba(255,176,32,.11),transparent 60%),var(--ink)}
@@ -61,7 +66,6 @@ button{font-family:inherit;cursor:pointer}
   padding:11px 14px;font-size:15px;font-family:inherit;transition:border-color .2s,box-shadow .2s}
 .field input:focus{outline:none;border-color:rgba(255,176,32,.55);box-shadow:0 0 0 3px rgba(255,176,32,.12)}
 .field .hintline{font-size:11.5px;color:var(--mut);margin-top:5px}
-/* ---------- 👁 password eye ---------- */
 .pass-wrap{position:relative}
 .pass-wrap input{padding-right:44px}
 .settings-row .pass-wrap input{width:100%}
@@ -84,6 +88,7 @@ button{font-family:inherit;cursor:pointer}
 /* ---------- APP ---------- */
 #appView{max-width:1060px;margin:0 auto;padding:22px clamp(14px,3vw,32px) 80px}
 .topbar{display:flex;align-items:center;gap:16px;padding:10px 0 22px;flex-wrap:wrap;transform:translateZ(0)}
+.top-actions{display:flex;align-items:center;gap:16px;min-width:0}
 .icon-btn{position:relative;background:var(--panel2);border:1px solid var(--line);color:var(--text);width:38px;height:38px;border-radius:9px;transition:.2s;
   display:inline-flex;align-items:center;justify-content:center}
 .icon-btn svg{width:19px;height:19px;fill:currentColor;display:block}
@@ -145,7 +150,7 @@ button{font-family:inherit;cursor:pointer}
 .hm-foot .spectrum-bar{width:150px}
 .hm-foot .hint{margin-left:auto;font-style:italic}
 
-/* ---------- overlays (✅ flicker fix: blur shudhu khola modal e) ---------- */
+/* ---------- overlays (flicker-safe: blur shudhu khola modal e) ---------- */
 .overlay{position:fixed;inset:0;background:rgba(5,8,12,.9);z-index:60;
   display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;pointer-events:none;transition:opacity .25s}
 .overlay.show{opacity:1;pointer-events:auto;backdrop-filter:blur(6px)}
@@ -227,25 +232,14 @@ button{font-family:inherit;cursor:pointer}
   #authView{grid-template-columns:1fr}
   .auth-left{border-right:0;border-bottom:1px solid var(--line)}
   #todayBtn{margin-left:0;width:100%}
-  .topbar{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:8px 10px;
-    grid-template-areas:"brand legend legend" "mates gear chip";align-items:center}
-  .brand{grid-area:brand}
-  .legend-anim{grid-area:legend;margin-left:0;justify-self:end}
+  .legend-anim{margin-left:0}
   .la-svg{width:150px;height:33px}
-  #matesBtn{grid-area:mates}
-  #gearBtn{grid-area:gear}
-  .user-chip{grid-area:chip;min-width:0;gap:6px;padding:5px 6px}
+  .top-actions{gap:8px;width:100%}
+  .user-chip{flex:1;min-width:0;gap:6px;padding:5px 6px}
   #chipName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .user-chip button{flex:none;padding:4px 8px;font-size:11px}
 }
 </style>
-<link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#0b0e13">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="HueMore">
-<link rel="apple-touch-icon" href="/icon-192.png">
 </head>
 <body>
 <div id="bg" aria-hidden="true"></div>
@@ -317,6 +311,7 @@ button{font-family:inherit;cursor:pointer}
       </svg>
     </div>
 
+    <div class="top-actions">
     <button class="icon-btn" id="matesBtn" title="Mates & requests" aria-label="Mates and requests">
       <svg viewBox="0 0 45.902 45.902" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M43.162,26.681c-1.564-1.578-3.631-2.539-5.825-2.742c1.894-1.704,3.089-4.164,3.089-6.912c0-5.141-4.166-9.307-9.308-9.307c-4.911,0-8.932,3.804-9.281,8.625c4.369,1.89,7.435,6.244,7.435,11.299c0,1.846-0.42,3.65-1.201,5.287c1.125,0.588,2.162,1.348,3.066,2.26c2.318,2.334,3.635,5.561,3.61,8.851l-0.002,0.067l-0.002,0.057l-0.082,1.557h11.149l0.092-12.33C45.921,30.878,44.936,28.466,43.162,26.681z"/>
@@ -333,6 +328,7 @@ button{font-family:inherit;cursor:pointer}
     </button>
 
     <div class="user-chip"><span id="chipAv"></span><span id="chipName"></span><button id="signOutBtn">Sign out</button></div>
+    </div>
   </header>
 
   <div class="view-banner" id="viewBanner" hidden>
@@ -502,7 +498,7 @@ button{font-family:inherit;cursor:pointer}
 
 <script type="module">
 /* ══════════ ☁ FIREBASE CONFIG — tomar 6 ta value ekhane boshao ══════════ */
-const FIREBASE_CONFIG = { apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", authDomain:"huemore.firebaseapp.com", projectId:"huemore", storageBucket:"huemore.firebasestorage.app", messagingSenderId:"700576442367", appId:"1:700576442367:web:fb37e1692e29c6ba56e9ca" };
+const FIREBASE_CONFIG = { apiKey:"", authDomain:"", projectId:"", storageBucket:"", messagingSenderId:"", appId:"" };
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const LS={users:'hm.users',session:'hm.session',data:u=>'hm.data.'+u,stick:u=>'hm.stick.'+u,key:'hm.gemini',
