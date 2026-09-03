@@ -227,10 +227,14 @@ button{font-family:inherit;cursor:pointer}
   #authView{grid-template-columns:1fr}
   .auth-left{border-right:0;border-bottom:1px solid var(--line)}
   #todayBtn{margin-left:0;width:100%}
-  .legend-anim{margin-left:0}
-  .topbar{gap:8px}
-  .icon-btn{flex:none}
-  .user-chip{flex:1;min-width:0;gap:6px;padding:5px 6px}
+  .topbar{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:8px 10px;
+    grid-template-areas:"brand legend legend" "mates gear chip";align-items:center}
+  .brand{grid-area:brand}
+  .legend-anim{grid-area:legend;margin-left:0;justify-self:end}
+  .la-svg{width:150px;height:33px}
+  #matesBtn{grid-area:mates}
+  #gearBtn{grid-area:gear}
+  .user-chip{grid-area:chip;min-width:0;gap:6px;padding:5px 6px}
   #chipName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .user-chip button{flex:none;padding:4px 8px;font-size:11px}
 }
