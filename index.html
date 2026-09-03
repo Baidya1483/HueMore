@@ -1036,7 +1036,7 @@ async function viewUser(prof){
   state.viewing={profile:prof,entries,isMate};
   state.viewYear=new Date().getFullYear();
   $('#viewBanner').hidden=false;
-  $('#vbText').innerHTML=`Viewing <b>@${esc(prof.username||'—')}</b> · ${esc(prof.name||'')} ${isMate?'· Mates':''} — read only`;
+    $('#vbText').innerHTML=`Viewing <b>@${esc(prof.username||'—')}</b> · ${esc(pubName(prof))} ${isMate?'· Mates':''} — read only`;
   renderGrid(true);renderStats();closeOv($('#matesOverlay'));
   window.scrollTo({top:0,behavior:'smooth'});
 }
