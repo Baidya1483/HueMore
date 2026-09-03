@@ -771,7 +771,7 @@ $('#guestBtn').onclick=async()=>{localStorage.setItem(LS.session,'guest');await 
 /* ---------- enter app ---------- */
 async function ensureProfile(){
   let p=await profGet(state.myId);
-  if(!p){p={id:state.myId,email:state.email,name:state.displayName,username:'',unameLower:'',pic:null,
+  if(!p){p={id:state.myId,email:state.email,name:state.displayName,nameCustom:false,username:'',unameLower:'',pic:null,
     dashVis:'none',entryVis:'none',ts:Date.now()};
     if(state.pendingUsername&&UN_RE.test(state.pendingUsername)){
       try{const ex=await profByUsername(state.pendingUsername);
