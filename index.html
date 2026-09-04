@@ -106,7 +106,8 @@ button{font-family:inherit;cursor:pointer}
 .view-banner{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;
   background:linear-gradient(90deg,rgba(46,143,232,.16),rgba(255,176,32,.12));border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-bottom:14px;font-size:14px}
 .view-banner button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:8px;padding:7px 14px;font-weight:700;font-size:13px}
-.view-banner button:hover{border-color:rgba(255,255,255,.3)}.controls{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 20px}
+.view-banner button:hover{border-color:rgba(255,255,255,.3)}
+.controls{display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin:6px 0 20px}
 .quote-line{font-family:var(--disp);font-style:italic;font-size:clamp(15px,2.2vw,19px);color:var(--mut);
   text-align:center;margin:2px 0 18px;letter-spacing:.01em;animation:quoteIn .9s ease both}
 .quote-line em{font-weight:600;color:var(--text)}
@@ -146,6 +147,8 @@ button{font-family:inherit;cursor:pointer}
 .cell.pad{visibility:hidden;cursor:default}
 .cell:not(.future):not(.pad):hover{transform:scale(1.45);z-index:6;box-shadow:0 3px 12px rgba(0,0,0,.55)}
 .cell.today{box-shadow:0 0 0 1.5px var(--today)}
+.cell.bday{animation:bdayGlow 3s ease-in-out infinite}
+@keyframes bdayGlow{0%,100%{box-shadow:0 0 0 1.5px rgba(255,176,32,.55),0 0 4px rgba(255,176,32,.25)}50%{box-shadow:0 0 0 1.5px rgba(255,176,32,.95),0 0 10px rgba(255,176,32,.55)}}
 .cell.in{animation:cellIn .45s both}
 @keyframes cellIn{from{opacity:0;transform:scale(.3)}}
 .cell.pulse{animation:pulseCell 1s ease 3}
@@ -350,6 +353,11 @@ button{font-family:inherit;cursor:pointer}
     <button id="vbBack">← Back to my journal</button>
   </div>
 
+  <div class="view-banner" id="demoBar" hidden>
+    <span>🎭 <b>Demo preview</b> — sample data; your real journal is untouched.</span>
+    <button id="demoOff">← Back to my journal</button>
+  </div>
+
   <div class="controls">
     <div class="year-nav">
       <button id="yearPrev">‹</button><span class="yr" id="yearLabel"></span><button id="yearNext">›</button>
@@ -363,10 +371,10 @@ button{font-family:inherit;cursor:pointer}
     <button id="todayBtn">＋ Today's Entry</button>
   </div>
 
-    <div class="quote-line">"Every day may not be good, but there's <em>something good</em> in every day."</div>
+  <div class="quote-line">"Every day may not be good, but there's <em>something good</em> in every day."</div>
 
   <div class="hm-card">
-    <div id="emptyBar"><span>This year is still blank.</span><button id="sampleBtn">Load a sample year</button><span style="font-size:12px">(demo data — clear anytime from Settings)</span></div>
+    <div id="emptyBar"><span>This year is still blank.</span><button id="sampleBtn">Load a sample year</button><span style="font-size:12px">(demo preview — real entries stay safe)</span></div>
     <div class="hm-scroll">
       <div class="hm-months" id="months"></div>
       <div class="hm-row">
@@ -376,7 +384,7 @@ button{font-family:inherit;cursor:pointer}
     </div>
     <div class="hm-foot">
       <span style="color:var(--dys)">Dysphoric</span><span class="spectrum-bar"></span><span style="color:var(--euph)">Euphoric</span>
-      <span class="hint">click any day to open it · blank = unwritten · ivory corner = sticky note</span>
+      <span class="hint">click any day to open it · blank = unwritten · ivory corner = sticky note · glowing amber = your birthday 🎂</span>
     </div>
   </div>
 </section>
@@ -454,6 +462,8 @@ button{font-family:inherit;cursor:pointer}
       <div class="pf-line"><input id="pfName" type="text" placeholder="Display name"><button id="pfNameSave">Save</button></div></div>
     <div class="settings-row"><div><div class="t">Username <span style="color:var(--mut);font-weight:400">(unique)</span></div><div class="s" id="pfUserHint">Letters, numbers and - _ &lt; ^ &gt; only.</div></div>
       <div class="pf-line"><input id="pfUser" type="text" placeholder="unique-username"><button id="pfUserSave">Save</button></div></div>
+    <div class="settings-row"><div><div class="t">Date of birth 🎂</div><div class="s">Private — stays on this device only. Your birthday box glows gently in every year.</div></div>
+      <div class="pf-line"><input id="pfDob" type="date"><button id="pfDobSave">Save</button><button id="pfDobRm">Remove</button></div></div>
 
     <div class="set-sec">Privacy</div>
     <div class="settings-row"><div><div class="t">Dashboard visible to</div><div class="s">Who can open your year grid.</div></div>
@@ -489,8 +499,10 @@ button{font-family:inherit;cursor:pointer}
       <div class="s">LLM interpretation via Google Gemini — aistudio.google.com/apikey</div></div>
       <div class="pf-line"><input id="gemKey" type="password" placeholder="AIza..."><button id="gemSave">Save</button><button id="gemRemove">Remove</button></div></div>
     <div class="settings-row"><div><div class="t">Cloud sync</div><div class="s" id="cloudInfo"></div></div></div>
-    <div class="settings-row"><div><div class="t">Sample data</div><div class="s">Demo entries to preview the grid.</div></div>
-      <div class="pf-line"><button id="sSample">Load samples</button><button id="sClearS">Clear samples</button></div></div>
+    <div class="settings-row"><div><div class="t">Demo dashboard 🎭</div><div class="s">Preview a sample year — real entries stay untouched.</div></div>
+      <div class="pills" id="demoRow"><button class="pill" data-v="off">Off</button><button class="pill" data-v="on">On</button></div></div>
+    <div class="settings-row"><div><div class="t">Old samples</div><div class="s">Age kono sample entry mishe thakle saaf koro.</div></div>
+      <div class="pf-line"><button id="sClearS">Clear samples</button></div></div>
     <div class="settings-row"><div><div class="t" style="color:#ff8484">Danger zone</div><div class="s">Delete every entry & note on this device.</div></div>
       <button id="sClearAll">Clear all</button></div>
   </div>
@@ -518,8 +530,8 @@ const FIREBASE_CONFIG = { apiKey:"AIzaSyB_iLrSyIeJsm1Ouvuc7HkYQXIAwRO4bfk", auth
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const LS={users:'hm.users',session:'hm.session',data:u=>'hm.data.'+u,stick:u=>'hm.stick.'+u,key:'hm.gemini',
-  profiles:'hm.profiles',requests:'hm.requests',mates:'hm.mates'};
-const state={user:null,myId:null,email:'',displayName:'',profile:null,entries:{},stickies:{},viewYear:new Date().getFullYear(),viewing:null};
+  profiles:'hm.profiles',requests:'hm.requests',mates:'hm.mates',dob:u=>'hm.dob.'+u};
+const state={user:null,myId:null,email:'',displayName:'',profile:null,entries:{},stickies:{},viewYear:new Date().getFullYear(),viewing:null,demo:false,demoData:{},dob:''};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 /* ---------- utils ---------- */
@@ -625,7 +637,10 @@ async function initFirebase(){
   }catch(e){console.warn('Firebase unavailable:',e);fb=null}
 }
 
-/* ---------- unified social API ---------- */
+/* ---------- unified social API (privacy-safe) ---------- */
+const pubName=p=>(p.nameCustom&&p.name)?p.name:((p.username||'').trim()||'HueMore user');
+const pubProf=p=>({id:p.id,name:pubName(p),username:p.username||'',pic:p.pic||null});
+const snapProf=p=>pubProf(p);
 async function profGet(id){
   if(cloud()){const d=await fb.F.getDoc(fb.F.doc(fb.db,'profiles',id));return d.exists()?d.data():null}
   return getLP()[id]||null;
@@ -640,9 +655,6 @@ async function profByUsername(un){
     return s.empty?null:s.docs[0].data()}
   return Object.values(getLP()).find(p=>p.unameLower===un)||null;
 }
-const pubName=p=>(p.nameCustom&&p.name)?p.name:((p.username||'').trim()||'HueMore user');
-const pubProf=p=>({id:p.id,name:pubName(p),username:p.username||'',pic:p.pic||null});
-const snapProf=p=>pubProf(p);
 const reqId=(a,b)=>a+'__'+b;
 async function reqSend(toProf){
   const r={id:reqId(state.myId,toProf.id),from:state.myId,to:toProf.id,fp:snapProf(state.profile),ts:Date.now()};
@@ -799,7 +811,8 @@ async function enterApp(){
     state.entries=readLocal(state.user);state.stickies=readLocalS(state.user);
     await ensureProfile();
   }
-  state.viewing=null;
+  state.dob=localStorage.getItem(LS.dob(state.myId))||'';
+  state.viewing=null;state.demo=false;state.demoData={};
   $('#authView').style.display='none';$('#appView').hidden=false;
   updateUserChip();renderGrid(true);renderStats();refreshBadge();
 }
@@ -816,7 +829,7 @@ $('#signOutBtn').onclick=async()=>{
   localStorage.removeItem(LS.session);location.reload();};
 
 /* ---------- data source ---------- */
-const SRC=()=>state.viewing?state.viewing.entries:state.entries;
+const SRC=()=>state.viewing?state.viewing.entries:(state.demo?state.demoData:state.entries);
 
 /* ---------- heatmap ---------- */
 function renderGrid(animate=true){
@@ -832,6 +845,9 @@ function renderGrid(animate=true){
       s.style.gridColumnStart=w+1;months.appendChild(s);lastM=m}
   }
   const tK=todayKey();
+  let bdayKey=null;
+  if(!state.viewing&&state.dob){const[by,bm,bd]=state.dob.split('-').map(Number);
+    if(y>=by)bdayKey=keyOf(new Date(y,bm-1,bd));}
   for(let i=0;i<offset;i++){const p=document.createElement('span');p.className='cell pad';grid.appendChild(p)}
   for(let i=0;i<days;i++){
     const d=new Date(y,0,1+i),k=keyOf(d),e=src[k],b=document.createElement('button');
@@ -839,13 +855,14 @@ function renderGrid(animate=true){
     if(k>tK){b.classList.add('future');b.tabIndex=-1}
     else if(e){b.style.backgroundColor=e.color;b.dataset.tip=`${fmtShort(d)} · ${e.mood}`}
     else{b.classList.add('empty');b.dataset.tip=`${fmtShort(d)} · no entry`}
-    if(!state.viewing&&state.stickies[k])b.appendChild(Object.assign(document.createElement('i'),{className:'stick'}));
-    if(!state.viewing&&k===tK)b.classList.add('today');
+    if(bdayKey&&k===bdayKey){b.classList.add('bday');b.dataset.tip=`${fmtShort(d)} · 🎂 birthday`}
+    if(!state.viewing&&!state.demo&&state.stickies[k])b.appendChild(Object.assign(document.createElement('i'),{className:'stick'}));
+    if(!state.viewing&&!state.demo&&k===tK)b.classList.add('today');
     if(animate){b.classList.add('in');b.style.animationDelay=(Math.floor((offset+i)/7)*4+(i%7)*10)+'ms'}
     grid.appendChild(b);
   }
   const hasYear=Object.keys(src).some(k=>k.startsWith(y+'-'));
-  $('#emptyBar').style.display=(!state.viewing&&!hasYear)?'flex':'none';
+  $('#emptyBar').style.display=(!state.viewing&&!state.demo&&!hasYear)?'flex':'none';
 }
 $('#grid').addEventListener('click',e=>{
   const c=e.target.closest('.cell');if(!c||c.classList.contains('future')||c.classList.contains('pad'))return;
@@ -864,13 +881,13 @@ function renderStats(){
   if(ks.length){const avg=ks.reduce((a,k)=>a+src[k].score,0)/ks.length;
     $('#stMood').innerHTML=`<span class="mood-chip" style="background:${lerpColor(avg)}">${moodLabel(avg)}</span>`}
   else $('#stMood').textContent='—';
-  $('#todayBtn').style.display=state.viewing?'none':'';
+  $('#todayBtn').style.display=(state.viewing||state.demo)?'none':'';
   updateTodayBtn();
 }
 function updateTodayBtn(){if(!state.viewing)$('#todayBtn').textContent=state.entries[todayKey()]?'❮ Open today\u2019s entry':'＋ Today\u2019s Entry'}
 $('#todayBtn').onclick=()=>{const k=todayKey();state.entries[k]?openDay(k):openEditor(k)};
 function changeYear(d){const el=$('#yearLabel');if(el.classList.contains('flip'))return;
-  el.classList.add('flip');setTimeout(()=>{state.viewYear+=d;renderGrid(true);renderStats()},200);
+  el.classList.add('flip');setTimeout(()=>{state.viewYear+=d;if(state.demo)genDemo(true);renderGrid(true);renderStats()},200);
   el.addEventListener('animationend',()=>el.classList.remove('flip'),{once:true})}
 $('#yearPrev').onclick=()=>changeYear(-1);
 $('#yearNext').onclick=()=>changeYear(1);
@@ -878,10 +895,10 @@ $('#yearNext').onclick=()=>changeYear(1);
 /* ---------- day modal ---------- */
 let dayKey=null;
 function openDay(k){
-  dayKey=k;const viewing=!!state.viewing,src=SRC(),e=src[k];
+  dayKey=k;const viewing=!!state.viewing||state.demo,src=SRC(),e=src[k];
   $('#dmDate').textContent=fmtLong(parseKey(k));
   $('#dmEntry').hidden=!e;$('#dmBlank').hidden=!!e;
-  $('#dmBlankTxt').textContent=viewing?'This day is private.':'Nothing was written here — the box stays blank.';
+  $('#dmBlankTxt').textContent=viewing?(state.demo?'A quiet day in the demo.':'This day is private.'):'Nothing was written here — the box stays blank.';
   if(e){
     $('#dmMarker').style.left=(e.score*100)+'%';
     const chip=$('#dmMood');chip.textContent=e.mood;chip.style.backgroundColor=e.color;
@@ -948,6 +965,34 @@ $('#skSave').onclick=async()=>{
   setTimeout(()=>openDay(stickKey),250);
 };
 
+/* ---------- demo mode ---------- */
+const SAMPLES={
+ bright:["One of those rare days where everything felt light. Morning coffee, a long walk, then good news in the evening. I kept smiling for no reason.","Laughed until my stomach hurt with old friends tonight. The kind of joy that stays with you long after midnight.","Finished the big task ahead of time and it felt incredible. Celebrated with my favourite meal and zero guilt.","Sunshine, music in my ears, and a small win at work. Grateful doesn't even begin to cover it."],
+ mid:["A quiet, ordinary day. Some errands, some reading, an early night. Nothing dramatic — and honestly, that was nice.","Mixed feelings today. Productive morning, but a strange heaviness by evening. Hoping tomorrow is brighter.","Mostly routine tasks from start to finish. Felt okay — not great, not low. Just steady.","Spent the afternoon wandering without a plan. Sometimes the unstructured hours are the ones you remember."],
+ low:["A heavy day. Everything felt like effort, and I couldn't shake the worry sitting on my chest all evening.","Slept badly and it followed me around all day. Snapped at small things. Glad it's finally over.","Felt lonely tonight, even in a crowded room. Some days the quiet gets too loud.","Stress piled up from every direction at once. I survived it — but barely."]};
+function genDemo(quiet){
+  const today=new Date();let d=new Date(state.viewYear,0,1),t=.5+Math.random()*.25;
+  state.demoData={};
+  while(d<today&&d.getFullYear()===state.viewYear){
+    if(Math.random()<.62&&keyOf(d)!==todayKey()){
+      t=clamp(t+(Math.random()-.5)*.22);const s=clamp(t+(Math.random()-.5)*.12);
+      const arr=s>.63?SAMPLES.bright:s<.37?SAMPLES.low:SAMPLES.mid;
+      const text=arr[Math.floor(Math.random()*arr.length)];
+      state.demoData[keyOf(d)]={text,score:+s.toFixed(3),color:lerpColor(s),mood:moodLabel(s),words:wordCount(text),ts:Date.now(),engine:'Lexicon',sample:true};
+    }
+    d.setDate(d.getDate()+1);
+  }
+  state.demo=true;updateDemoUI();renderGrid(true);renderStats();
+  if(!quiet)toast('Demo year on — real journal untouched');
+}
+function exitDemo(){state.demo=false;updateDemoUI();renderGrid(true);renderStats();toast('Back to your real journal')}
+function updateDemoUI(){$('#demoBar').hidden=!state.demo}
+$('#sampleBtn').onclick=()=>genDemo();
+$('#demoOff').onclick=exitDemo;
+$('#demoRow').addEventListener('click',e=>{const b=e.target.closest('.pill');if(!b)return;
+  if(b.dataset.v==='on'){if(!state.demo)genDemo()}else if(state.demo)exitDemo();
+});
+
 /* ---------- settings ---------- */
 $('#gearBtn').onclick=()=>{refreshSettings();openOv($('#setOverlay'))};
 function refreshSettings(){
@@ -955,8 +1000,10 @@ function refreshSettings(){
   $('#pfAv').innerHTML=avatarHTML({...p,email:state.email,name:state.displayName},44);
   $('#pfName').value=p.name||state.displayName;
   $('#pfUser').value=p.username||'';
+  $('#pfDob').value=state.dob||'';
   $$('#dvRow .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===(p.dashVis||'none')));
   $$('#evRow .pill').forEach(b=>b.classList.toggle('on',b.dataset.v===(p.entryVis||'none')));
+  $$('#demoRow .pill').forEach(b=>b.classList.toggle('on',(b.dataset.v==='on')===state.demo));
   $('#engineState').textContent=localStorage.getItem(LS.key)?'Gemini LLM active (lexicon fallback offline)':'Built-in lexicon analyzer (fully offline)';
   $('#gemKey').value=localStorage.getItem(LS.key)||'';
   $('#cloudInfo').textContent=cloud()?`Synced as ${state.email} — journal follows you anywhere.`:'Local mode. Add the free Firebase config in code for cross-device sync.';
@@ -969,7 +1016,7 @@ $('#pfPic').addEventListener('change',async e=>{
 $('#pfPicRm').onclick=async()=>{state.profile.pic=null;await profSave(state.profile);updateUserChip();refreshSettings();toast('Picture removed — using default')};
 $('#pfNameSave').onclick=async()=>{
   const n=$('#pfName').value.trim();if(!n)return;
-    state.profile.name=n;state.profile.nameCustom=true;state.displayName=n;await profSave(state.profile);
+  state.profile.name=n;state.profile.nameCustom=true;state.displayName=n;await profSave(state.profile);
   updateUserChip();refreshSettings();toast('Profile name saved');
 };
 $('#pfUserSave').onclick=async()=>{
@@ -983,6 +1030,15 @@ $('#pfUserSave').onclick=async()=>{
   state.profile.username=un;state.profile.unameLower=low;await profSave(state.profile);
   hint.textContent='Letters, numbers and - _ < ^ > only.';
   updateUserChip();toast('Username saved: @'+un);
+};
+$('#pfDobSave').onclick=()=>{
+  state.dob=$('#pfDob').value||'';
+  localStorage.setItem(LS.dob(state.myId),state.dob);
+  renderGrid(false);toast('Birthday saved — watch your year glow 🎂');
+};
+$('#pfDobRm').onclick=()=>{
+  state.dob='';localStorage.removeItem(LS.dob(state.myId));$('#pfDob').value='';
+  renderGrid(false);toast('Birthday removed');
 };
 $('#dvRow').addEventListener('click',async e=>{
   const b=e.target.closest('.pill');if(!b)return;
@@ -1038,10 +1094,11 @@ async function viewUser(prof){
   if(!ok){toast('@'+(prof.username||'…')+' keeps this journal private');return}
   let entries={};
   if(prof.entryVis==='mates'&&isMate)entries=await fetchUserData(prof.id);
+  state.demo=false;updateDemoUI();
   state.viewing={profile:prof,entries,isMate};
   state.viewYear=new Date().getFullYear();
   $('#viewBanner').hidden=false;
-    $('#vbText').innerHTML=`Viewing <b>@${esc(prof.username||'—')}</b> · ${esc(pubName(prof))} ${isMate?'· Mates':''} — read only`;
+  $('#vbText').innerHTML=`Viewing <b>@${esc(prof.username||'—')}</b> · ${esc(pubName(prof))} ${isMate?'· Mates':''} — read only`;
   renderGrid(true);renderStats();closeOv($('#matesOverlay'));
   window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1094,26 +1151,7 @@ $('#matesOverlay').addEventListener('click',async e=>{
   await refreshMates();
 });
 
-/* ---------- samples ---------- */
-const SAMPLES={
- bright:["One of those rare days where everything felt light. Morning coffee, a long walk, then good news in the evening. I kept smiling for no reason.","Laughed until my stomach hurt with old friends tonight. The kind of joy that stays with you long after midnight.","Finished the big task ahead of time and it felt incredible. Celebrated with my favourite meal and zero guilt.","Sunshine, music in my ears, and a small win at work. Grateful doesn't even begin to cover it."],
- mid:["A quiet, ordinary day. Some errands, some reading, an early night. Nothing dramatic — and honestly, that was nice.","Mixed feelings today. Productive morning, but a strange heaviness by evening. Hoping tomorrow is brighter.","Mostly routine tasks from start to finish. Felt okay — not great, not low. Just steady.","Spent the afternoon wandering without a plan. Sometimes the unstructured hours are the ones you remember."],
- low:["A heavy day. Everything felt like effort, and I couldn't shake the worry sitting on my chest all evening.","Slept badly and it followed me around all day. Snapped at small things. Glad it's finally over.","Felt lonely tonight, even in a crowded room. Some days the quiet gets too loud.","Stress piled up from every direction at once. I survived it — but barely."]};
-function loadSamples(){
-  const today=new Date();let d=new Date(state.viewYear,0,1),t=.5+Math.random()*.25;
-  while(d<today&&d.getFullYear()===state.viewYear){
-    if(Math.random()<.62&&keyOf(d)!==todayKey()){
-      t=clamp(t+(Math.random()-.5)*.22);const s=clamp(t+(Math.random()-.5)*.12);
-      const arr=s>.63?SAMPLES.bright:s<.37?SAMPLES.low:SAMPLES.mid;
-      const text=arr[Math.floor(Math.random()*arr.length)];
-      state.entries[keyOf(d)]={text,score:+s.toFixed(3),color:lerpColor(s),mood:moodLabel(s),words:wordCount(text),ts:Date.now(),engine:'Lexicon',sample:true};
-    }
-    d.setDate(d.getDate()+1);
-  }
-  saveLocal();renderGrid(true);renderStats();toast('Sample year loaded');
-}
-$('#sampleBtn').onclick=loadSamples;
-$('#sSample').onclick=()=>{closeOv($('#setOverlay'));loadSamples()};
+/* ---------- samples cleanup ---------- */
 $('#sClearS').onclick=()=>{Object.keys(state.entries).forEach(k=>{if(state.entries[k].sample)delete state.entries[k]});saveLocal();renderGrid(true);renderStats();toast('Samples cleared')};
 $('#sClearAll').onclick=async()=>{if(!confirm('Delete ALL entries & sticky notes on this device?'))return;
   if(cloud()){try{
